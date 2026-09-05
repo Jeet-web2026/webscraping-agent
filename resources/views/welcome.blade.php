@@ -65,7 +65,7 @@
                 <section class="rounded-xl border border-slate-800 bg-[#111827]">
 
                     <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
                             Research Type
                         </p>
                     </div>
@@ -174,7 +174,7 @@
                     class="rounded-xl border border-slate-800 bg-[#111827]">
 
                     <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
                             Product Information
                         </p>
                     </div>
@@ -215,7 +215,7 @@
                         {{-- LOCATION --}}
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 Search Location
                             </p>
 
@@ -284,7 +284,7 @@
                         {{-- INFORMATION --}}
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 Information Required
                             </p>
 
@@ -328,7 +328,7 @@
                         {{-- SOURCES --}}
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 Preferred Sources
                             </p>
 
@@ -369,11 +369,11 @@
                                 Additional Instruction
                             </label>
 
-                            <input
+                            <textarea
                                 type="text"
                                 name="instructions"
                                 placeholder="e.g. Compare current prices from reliable sources"
-                                class="field-input">
+                                class="field-input" style="height: 80px; padding-top: 10px;"></textarea>
 
                         </div>
 
@@ -391,7 +391,7 @@
                     class="rounded-xl border border-slate-800 bg-[#111827]">
 
                     <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-emerald-400">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-emerald-400">
                             Service Information
                         </p>
                     </div>
@@ -430,7 +430,7 @@
 
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 Service Location
                             </p>
 
@@ -471,7 +471,7 @@
 
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 Information Required
                             </p>
 
@@ -524,7 +524,7 @@
                     class="rounded-xl border border-slate-800 bg-[#111827]">
 
                     <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-purple-400">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-purple-400">
                             Customer + AI
                         </p>
                     </div>
@@ -574,7 +574,7 @@
 
                         <div>
 
-                            <p class="mb-3 text-[12px] font-semibold text-slate-300">
+                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
                                 AI Action
                             </p>
 
@@ -678,7 +678,7 @@
 
                     <button
                         type="submit"
-                        class="h-9 rounded-md bg-blue-600 px-5 text-[12px] font-semibold text-white transition hover:bg-blue-500">
+                        class="h-9 rounded-md bg-blue-600 px-5 text-[15px] font-semibold text-white transition hover:bg-blue-500">
                         Search with AI
                     </button>
 
@@ -699,7 +699,7 @@
         .field-label {
             display: block;
             margin-bottom: 6px;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 500;
             color: rgb(148 163 184);
         }
