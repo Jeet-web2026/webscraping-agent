@@ -166,7 +166,7 @@ return [
 
         'chains' => [
             'research' => [
-                ['provider' => 'gemini', 'model' => 'gemini-2.5-flash'],
+                ['provider' => 'gemini', 'model' => 'gemini-3.6-flash'],
                 ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile'],
                 ['provider' => 'deepseek', 'model' => 'deepseek-chat'],
             ],

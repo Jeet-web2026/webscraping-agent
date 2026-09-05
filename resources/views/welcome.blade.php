@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>AI Research</title>
 
@@ -51,12 +52,14 @@
 
         <main class="mx-auto max-w-6xl px-6 py-7">
             @session('success')
-                <div class="mb-5 rounded-md border border-green-600 bg-green-600/10 px-4 py-3 text-sm text-green-400 mb-5">
-                    {{ session('success') }}
-                </div>
+            <div class="mb-5 rounded-md border border-green-600 bg-green-600/10 px-4 py-3 text-sm text-green-400 mb-5">
+                {{ session('success') }}
+            </div>
             @endsession
 
             <form
+                x-data="researchForm()"
+                @submit.prevent="submitForm($event)"
                 action="{{ route('ai-request.store') }}"
                 method="POST"
                 class="space-y-5">
@@ -670,23 +673,26 @@
                 {{-- ========================================== --}}
 
                 <div class="flex items-center justify-between rounded-xl border border-slate-800 bg-[#111827] px-5 py-4">
-
                     <div>
-                        <p class="text-[13px] font-medium">
-                            Ready to search?
-                        </p>
-
-                        <p class="mt-0.5 text-[11px] text-slate-500">
+                        <p class="text-[13px] font-medium" x-text="polling ? 'Processing…' : 'Ready to search?'"></p>
+                        <p class="mt-0.5 text-[11px] text-slate-500" x-show="!polling">
                             AI will retrieve and process the requested information.
                         </p>
+                        <p class="mt-0.5 text-[11px] text-red-400" x-show="errorMessage" x-text="errorMessage"></p>
                     </div>
 
                     <button
                         type="submit"
-                        class="h-9 rounded-md bg-blue-600 px-5 text-[15px] font-semibold text-white transition hover:bg-blue-500">
-                        Search with AI
+                        :disabled="loading || polling"
+                        class="h-9 rounded-md bg-blue-600 px-5 text-[15px] font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50">
+                        <span x-text="loading ? 'Submitting…' : (polling ? 'Working…' : 'Search with AI')"></span>
                     </button>
+                </div>
 
+                <div x-show="downloadUrl" class="rounded-xl border border-emerald-800 bg-emerald-500/10 px-5 py-4">
+                    <a :href="downloadUrl" target="_blank" class="text-emerald-300 font-semibold text-sm">
+                        📄 Download your document
+                    </a>
                 </div>
 
             </form>
@@ -741,6 +747,88 @@
         function researchForm() {
             return {
                 type: 'product',
+                loading: false,
+                polling: false,
+                status: null,
+                downloadUrl: null,
+                errorMessage: null,
+                requestId: null,
+
+                async submitForm(event) {
+                    this.loading = true;
+                    this.errorMessage = null;
+                    this.downloadUrl = null;
+                    this.status = null;
+
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                            },
+                            body: formData,
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Request failed: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        this.requestId = data.id;
+                        this.status = data.status;
+
+                        this.startPolling();
+
+                    } catch (err) {
+                        this.errorMessage = err.message;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                startPolling() {
+                    if (this.polling) return;
+                    this.polling = true;
+                    this.pollStatus();
+                },
+
+                async pollStatus() {
+                    if (!this.requestId) return;
+
+                    try {
+                        const response = await fetch(`/api/research-requests/${this.requestId}`, {
+                            method: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                        });
+
+                        const data = await response.json();
+                        this.status = data.status;
+
+                        if (data.status === 'done') {
+                            this.downloadUrl = data.download_url;
+                            this.polling = false;
+                            return;
+                        }
+
+                        if (data.status === 'failed') {
+                            this.errorMessage = data.error || 'Request failed.';
+                            this.polling = false;
+                            return;
+                        }
+
+                        setTimeout(() => this.pollStatus(), 3000);
+
+                    } catch (err) {
+                        this.errorMessage = 'Lost connection while checking status.';
+                        this.polling = false;
+                    }
+                },
             };
         }
     </script>

@@ -41,7 +41,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -58,6 +58,14 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
+        ],
+
+        'documents' => [
+            'driver' => env('DOCUMENTS_DISK_DRIVER', 'local'),
+            'root' => storage_path('app/public/documents'),
+            'url' => env('APP_URL') . '/storage/documents',
+            'visibility' => 'public',
+            'throw' => false,
         ],
 
     ],

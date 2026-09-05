@@ -33,7 +33,7 @@ class ResearchRequestController extends Controller
             : ResearchAgentJob::dispatch($record->id);
 
         return redirect()
-            ->route('ai-request.show', $record->id)
+            ->back()
             ->with('status', 'Request submitted — processing now.');
     }
 

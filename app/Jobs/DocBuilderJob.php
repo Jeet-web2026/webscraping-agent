@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Throwable;
@@ -40,12 +41,16 @@ class DocBuilderJob implements ShouldQueue
 
         $filename = "research-{$record->id}.docx";
         $localPath = storage_path("app/generated/{$filename}");
+        File::ensureDirectoryExists(storage_path('app/generated'));
         $tp->saveAs($localPath);
 
-        $s3Path = "documents/{$filename}";
-        Storage::disk('public')->put($s3Path, file_get_contents($localPath));
+        $documentsPath = "generated/{$filename}";
+        Storage::disk('documents')->put($documentsPath, file_get_contents($localPath));
 
-        $record->update(['status' => 'done', 'generated_file_path' => $s3Path]);
+        $record->update([
+            'status' => 'done',
+            'generated_file_path' => $documentsPath,
+        ]);
     }
 
     protected function format(ResearchRequest $record, ModelFailoverManager $failover)
