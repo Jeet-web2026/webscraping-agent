@@ -163,6 +163,14 @@ return [
                 ],
             ],
         ],
+
+        'chains' => [
+            'research' => [
+                ['provider' => 'gemini', 'model' => 'gemini-2.5-flash'],
+                ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile'],
+                ['provider' => 'deepseek', 'model' => 'deepseek-chat'],
+            ],
+        ],
     ],
 
 ];

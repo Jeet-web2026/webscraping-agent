@@ -57,7 +57,7 @@
             @endsession
 
             <form
-                action="{{  url('/') }}"
+                action="{{ route('ai-request.store') }}"
                 method="POST"
                 class="space-y-5">
 
