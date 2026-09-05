@@ -800,7 +800,7 @@
                     if (!this.requestId) return;
 
                     try {
-                        const response = await fetch(`/api/research-requests/${this.requestId}`, {
+                        const response = await fetch(`/research-requests/${this.requestId}`, {
                             method: 'GET',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content

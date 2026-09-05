@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 
 class ResearchRequestController extends Controller
 {
-    public function store(StoreAiRequest $request): RedirectResponse
+    public function store(StoreAiRequest $request): JsonResponse|RedirectResponse
     {
         $data = $request->validated();
 
@@ -32,9 +32,11 @@ class ResearchRequestController extends Controller
             ? null
             : ResearchAgentJob::dispatch($record->id);
 
-        return redirect()
-            ->back()
-            ->with('status', 'Request submitted — processing now.');
+        return response()->json([
+            'id' => $record->id,
+            'status' => $record->status,
+            'message' => 'Request submitted — processing now.',
+        ], 202);
     }
 
     protected function compactProduct(array $d): array

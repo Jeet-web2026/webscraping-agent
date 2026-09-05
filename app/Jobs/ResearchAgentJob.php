@@ -41,13 +41,15 @@ class ResearchAgentJob implements ShouldQueue
             . "\nUser request: {$record->user_prompt}";
 
         foreach ($candidates as $candidate) {
-            Log::info("Trying model {$candidate['provider']}:{$candidate['model']} for request {$this->requestId}");
+            Log::info("Trying model {$candidate['provider']}:{$candidate['model']} for request {$this->requestId} Prompt: {$prompt}");
             try {
                 $response = (new ResearchAgent)->prompt(
                     $prompt,
                     provider: $candidate['provider'],
                     model: $candidate['model'],
                 );
+
+                Log::info("Model {$candidate['provider']}:{$candidate['model']} succeeded for request {$this->requestId} Response: {$response}");
 
                 $record->update([
                     'status' => 'researched',
