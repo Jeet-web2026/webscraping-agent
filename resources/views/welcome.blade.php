@@ -50,9 +50,14 @@
 
 
         <main class="mx-auto max-w-6xl px-6 py-7">
+            @session('success')
+                <div class="mb-5 rounded-md border border-green-600 bg-green-600/10 px-4 py-3 text-sm text-green-400 mb-5">
+                    {{ session('success') }}
+                </div>
+            @endsession
 
             <form
-                action=""
+                action="{{  url('/') }}"
                 method="POST"
                 class="space-y-5">
 
