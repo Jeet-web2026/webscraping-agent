@@ -13,8 +13,8 @@ return [
     |
     */
 
-    'default' => 'gemini',
-    'default_for_images' => 'gemini',
+    'default' => 'openrouter',
+    'default_for_images' => 'openrouter',
     'default_for_audio' => 'openai',
     'default_for_transcription' => 'openai',
     'default_for_embeddings' => 'openai',
@@ -166,11 +166,17 @@ return [
 
         'chains' => [
             'research' => [
+                ['provider' => 'openrouter', 'model' => 'openai/gpt-oss-20b'],
                 ['provider' => 'gemini', 'model' => 'gemini-3.5-flash'],
                 ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile'],
-                ['provider' => 'deepseek', 'model' => 'deepseek-chat'],
+                ['provider' => 'deepseek', 'model' => 'deepseek-v4-flash'],
+                ['provider' => 'kimi', 'model' => 'kimi-k3'],
             ],
         ],
+        'serpapi' => [
+            'key' => env('SERA_API_KEY'),
+            'uri' => env('SERA_API_URI'),
+        ]
     ],
 
 ];

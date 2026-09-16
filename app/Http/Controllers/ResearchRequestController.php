@@ -7,6 +7,7 @@ use App\Jobs\ResearchAgentJob;
 use App\Models\ResearchRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ResearchRequestController extends Controller
 {
@@ -131,7 +132,10 @@ class ResearchRequestController extends Controller
             'result' => $researchRequest->result,
             'error' => $researchRequest->error,
             'download_url' => $researchRequest->generated_file_path
-                ? $researchRequest->generated_file_path
+                ? Storage::disk('local')->temporaryUrl(
+                    'documents/' . $researchRequest->generated_file_path,
+                    now()->addMinutes(30)
+                )
                 : null,
         ]);
     }

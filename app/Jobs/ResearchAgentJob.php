@@ -2,17 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Ai\Agents\ResearchAgent;
 use App\Models\ResearchRequest;
-use App\Services\DedupGuardService;
-use App\Services\ModelFailoverManager;
+use App\Services\SerpApiQueryBuilder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Throwable;
+use RuntimeException;
+use SerpApi\Client;
 
 class ResearchAgentJob implements ShouldQueue
 {
@@ -23,57 +23,33 @@ class ResearchAgentJob implements ShouldQueue
 
     public function __construct(protected int $requestId) {}
 
-    public function handle(ModelFailoverManager $failover): void
+    public function handle(): void
     {
         $record = ResearchRequest::findOrFail($this->requestId);
-        $record->update(['status' => 'researching']);
+        $record->update(['status' => 'processing']);
 
-        app()->instance(DedupGuardService::class, new DedupGuardService($this->requestId));
+        try {
+            $query = SerpApiQueryBuilder::forProduct($record->subject, $record->filters);
+            Log::info([$query]);
+            $query['api_key'] = config('ai.providers.serpapi.key');
 
-        $candidates = $failover->availableCandidates('research');
+            $response = Http::get('https://serpapi.com/search.json', $query);
 
-        if (empty($candidates)) {
-            $record->update(['status' => 'failed', 'error' => 'All models are currently cooling down. Try again shortly.']);
-            return;
-        }
-
-        $prompt = "Subject: {$record->subject}\nFilters: " . json_encode($record->filters)
-            . "\nUser request: {$record->user_prompt}";
-
-        foreach ($candidates as $candidate) {
-            Log::info("Trying model {$candidate['provider']}:{$candidate['model']} for request {$this->requestId} Prompt: {$prompt}");
-            try {
-                $response = (new ResearchAgent)->prompt(
-                    $prompt,
-                    provider: $candidate['provider'],
-                    model: $candidate['model'],
-                );
-
-                Log::info("Model {$candidate['provider']}:{$candidate['model']} succeeded for request {$this->requestId} Response: {$response}");
-
-                $record->update([
-                    'status' => 'researched',
-                    'model_used' => "{$candidate['provider']}:{$candidate['model']}",
-                    'result' => $response,
-                ]);
-
-                DocBuilderJob::dispatch($record->id);
-                return; // success — stop trying other models
-
-            } catch (Throwable $e) {
-                Log::warning("Model {$candidate['provider']}:{$candidate['model']} failed: {$e->getMessage()}");
-
-                if ($this->looksLikeRateLimitOrOverload($e)) {
-                    $failover->markUnavailable($candidate['provider'], $candidate['model']);
-                }
+            if ($response->failed()) {
+                throw new RuntimeException("SerpApi error: {$response->body()}");
             }
+
+            $localResults = $response->json('local_results') ?? [];
+            Log::info([$localResults]);
+            $record->update([
+                'status' => 'completed',
+                'result' => ['result' => $localResults],
+            ]);
+
+            $record->update(['status' => 'completed']);
+        } catch (\Throwable $e) {
+            $record->update(['status' => 'failed']);
+            throw $e;
         }
-
-        $record->update(['status' => 'failed', 'error' => 'All configured models failed for this request.']);
-    }
-
-    protected function looksLikeRateLimitOrOverload(Throwable $e): bool
-    {
-        return (bool) preg_match('/(overloaded|rate.?limit|429|503|quota)/i', $e->getMessage());
     }
 }
