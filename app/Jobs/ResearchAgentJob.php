@@ -10,9 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
-use SerpApi\Client;
 
 class ResearchAgentJob implements ShouldQueue
 {
@@ -30,7 +28,6 @@ class ResearchAgentJob implements ShouldQueue
 
         try {
             $query = SerpApiQueryBuilder::forProduct($record->subject, $record->filters);
-            Log::info([$query]);
             $query['api_key'] = config('ai.providers.serpapi.key');
 
             $response = Http::get('https://serpapi.com/search.json', $query);
@@ -40,7 +37,7 @@ class ResearchAgentJob implements ShouldQueue
             }
 
             $localResults = $response->json('local_results') ?? [];
-            Log::info([$localResults]);
+
             $record->update([
                 'status' => 'completed',
                 'result' => ['result' => $localResults],

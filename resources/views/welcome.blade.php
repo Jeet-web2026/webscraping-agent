@@ -809,8 +809,9 @@
 
                         const data = await response.json();
                         this.status = data.status;
+                        console.log(data.status);
 
-                        if (data.status === 'done') {
+                        if (data.status === 'completed') {
                             this.downloadUrl = data.download_url;
                             this.polling = false;
                             return;

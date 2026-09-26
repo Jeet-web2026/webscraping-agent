@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ResearchResultExport;
 use App\Http\Requests\StoreAiRequest;
 use App\Jobs\ResearchAgentJob;
 use App\Models\ResearchRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Excel as MaatwebsiteExcel;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ResearchRequestController extends Controller
 {
@@ -131,12 +135,27 @@ class ResearchRequestController extends Controller
             'model_used' => $researchRequest->model_used,
             'result' => $researchRequest->result,
             'error' => $researchRequest->error,
-            'download_url' => $researchRequest->generated_file_path
-                ? Storage::disk('local')->temporaryUrl(
-                    'documents/' . $researchRequest->generated_file_path,
-                    now()->addMinutes(30)
+            'download_url' => $researchRequest->status === 'completed'
+                ? URL::temporarySignedRoute(
+                    'research-requests.download',
+                    now()->addMinutes(30),
+                    ['researchRequest' => $researchRequest->id]
                 )
                 : null,
         ]);
+    }
+
+    public function download(ResearchRequest $researchRequest): BinaryFileResponse
+    {
+        abort_unless($researchRequest->status === 'completed', 404);
+
+        $filename = 'research-' . $researchRequest->id . '.xlsx';
+
+        return Excel::download(
+            new ResearchResultExport($researchRequest),
+            $filename,
+            MaatwebsiteExcel::XLSX,
+            ['Cache-Control' => 'no-store, no-cache, must-revalidate']
+        );
     }
 }
