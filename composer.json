@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.5",
         "ext-gd": "*",
+         "ext-zip": "*",
         "laravel/ai": "^0.11.2",
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
