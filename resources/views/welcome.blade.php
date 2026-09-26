@@ -40,12 +40,6 @@
                     </p>
                 </div>
 
-                <div class="rounded-md border border-slate-700 bg-slate-800/70 px-3 py-1.5">
-                    <span class="text-[11px] font-medium text-slate-300">
-                        AI Powered
-                    </span>
-                </div>
-
             </div>
         </header>
 
@@ -78,97 +72,19 @@
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 p-4">
+                    <div class="p-4 w-full">
 
-                        {{-- PRODUCT --}}
-                        <button
-                            type="button"
-                            @click="type = 'product'"
-                            :class="type === 'product'
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-slate-700 bg-slate-900 hover:border-slate-600'"
-                            class="rounded-lg border px-4 py-3 text-left transition">
-                            <div class="flex items-center justify-between">
+                        <select
+                            x-model="type"
+                            name="type"
+                            class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
 
-                                <div>
-                                    <p class="text-[13px] font-semibold">
-                                        Product
-                                    </p>
+                            <option value="product">Product — Product, price & seller information</option>
+                            <option value="service">Service — Find services by PIN code</option>
 
-                                    <p class="mt-0.5 text-[11px] text-slate-400">
-                                        Product, price & seller information
-                                    </p>
-                                </div>
-
-                                <span
-                                    x-show="type === 'product'"
-                                    class="h-2 w-2 rounded-full bg-blue-400"></span>
-
-                            </div>
-                        </button>
-
-
-                        {{-- SERVICE --}}
-                        <button
-                            type="button"
-                            @click="type = 'service'"
-                            :class="type === 'service'
-                            ? 'border-emerald-500 bg-emerald-500/10'
-                            : 'border-slate-700 bg-slate-900 hover:border-slate-600'"
-                            class="rounded-lg border px-4 py-3 text-left transition">
-                            <div class="flex items-center justify-between">
-
-                                <div>
-                                    <p class="text-[13px] font-semibold">
-                                        Service
-                                    </p>
-
-                                    <p class="mt-0.5 text-[11px] text-slate-400">
-                                        Find services by PIN code
-                                    </p>
-                                </div>
-
-                                <span
-                                    x-show="type === 'service'"
-                                    class="h-2 w-2 rounded-full bg-emerald-400"></span>
-
-                            </div>
-                        </button>
-
-
-                        {{-- CUSTOMER --}}
-                        <button
-                            type="button"
-                            @click="type = 'customer'"
-                            :class="type === 'customer'
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-slate-700 bg-slate-900 hover:border-slate-600'"
-                            class="rounded-lg border px-4 py-3 text-left transition">
-                            <div class="flex items-center justify-between">
-
-                                <div>
-                                    <p class="text-[13px] font-semibold">
-                                        Customer + AI
-                                    </p>
-
-                                    <p class="mt-0.5 text-[11px] text-slate-400">
-                                        Database analysis & AI answers
-                                    </p>
-                                </div>
-
-                                <span
-                                    x-show="type === 'customer'"
-                                    class="h-2 w-2 rounded-full bg-purple-400"></span>
-
-                            </div>
-                        </button>
+                        </select>
 
                     </div>
-
-                    <input
-                        type="hidden"
-                        name="type"
-                        :value="type">
 
                 </section>
 
