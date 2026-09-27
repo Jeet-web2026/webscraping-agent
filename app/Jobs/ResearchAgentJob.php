@@ -2,19 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Helpers\SerpApiHelper;
 use App\Models\ResearchRequest;
-use App\Services\SerpApiQueryBuilder;
+use App\Services\Products\SerpApiProductsQueryBuilder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
-use RuntimeException;
 
 class ResearchAgentJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     public int $tries = 1;
     public int $timeout = 180;
@@ -27,23 +25,14 @@ class ResearchAgentJob implements ShouldQueue
         $record->update(['status' => 'processing']);
 
         try {
-            $query = SerpApiQueryBuilder::forProduct($record->subject, $record->filters);
-            $query['api_key'] = config('ai.providers.serpapi.key');
+            $query = SerpApiProductsQueryBuilder::forProduct($record->subject, $record->filters);
 
-            $response = Http::get('https://serpapi.com/search.json', $query);
-
-            if ($response->failed()) {
-                throw new RuntimeException("SerpApi error: {$response->body()}");
-            }
-
-            $localResults = $response->json('local_results') ?? [];
+            $response = SerpApiHelper::search($query);
 
             $record->update([
-                'status' => 'completed',
-                'result' => ['result' => $localResults],
+                'status' => 'initial_completed',
+                'result' => ['result' =>  $response->json('local_results') ?? []],
             ]);
-
-            $record->update(['status' => 'completed']);
         } catch (\Throwable $e) {
             $record->update(['status' => 'failed']);
             throw $e;

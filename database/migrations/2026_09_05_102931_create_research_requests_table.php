@@ -20,6 +20,7 @@ return new class extends Migration
             $t->string('status')->default('pending');
             $t->string('model_used')->nullable();
             $t->json('result')->nullable();
+            $t->json('iamges_result')->nullable();
             $t->string('generated_file_path')->nullable();
             $t->text('error')->nullable();
             $t->timestamps();

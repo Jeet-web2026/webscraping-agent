@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Exports\ResearchResultExport;
 use App\Http\Requests\StoreAiRequest;
+use App\Jobs\FetchProductWebDataJob;
 use App\Jobs\ResearchAgentJob;
 use App\Models\ResearchRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\URL;
 use Maatwebsite\Excel\Excel as MaatwebsiteExcel;
 use Maatwebsite\Excel\Facades\Excel;
@@ -33,9 +35,12 @@ class ResearchRequestController extends Controller
             'status' => 'pending',
         ]);
 
-        $data['type'] === 'customer'
-            ? null
-            : ResearchAgentJob::dispatch($record->id);
+        if ($data['type'] === 'product') {
+            Bus::chain([
+                new ResearchAgentJob($record->id),
+                new FetchProductWebDataJob($record, $data)
+            ])->dispatch();
+        }
 
         return response()->json([
             'id' => $record->id,
@@ -130,11 +135,16 @@ class ResearchRequestController extends Controller
 
     public function show(ResearchRequest $researchRequest): JsonResponse
     {
+        $researchRequest->load(
+            'productDetails'
+        );
+        
         return response()->json([
             'status' => $researchRequest->status,
             'model_used' => $researchRequest->model_used,
             'result' => $researchRequest->result,
             'error' => $researchRequest->error,
+            'image_urls' => $researchRequest->productDetails?->recent_photo,
             'download_url' => $researchRequest->status === 'completed'
                 ? URL::temporarySignedRoute(
                     'research-requests.download',

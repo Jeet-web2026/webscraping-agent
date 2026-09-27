@@ -224,7 +224,6 @@
                                 'address' => 'Seller Address',
                                 'contact' => 'Seller Contact',
                                 'website' => 'Website',
-                                'video_link' => 'Video Link',
                                 'availability' => 'Availability',
                                 ] as $value => $label)
 
@@ -260,7 +259,6 @@
 
                                 @foreach([
                                 'search' => 'Search Engines',
-                                'official' => 'Official Website',
                                 'ecommerce' => 'E-commerce',
                                 'news' => 'News'
                                 ] as $value => $label)
@@ -268,8 +266,8 @@
                                 <label class="cursor-pointer">
 
                                     <input
-                                        type="checkbox"
-                                        name="sources[]"
+                                        type="radio"
+                                        name="source"
                                         value="{{ $value }}"
                                         class="peer sr-only">
 
@@ -611,6 +609,10 @@
                     </a>
                 </div>
 
+                <section class="flex gap-2 items-center image_show" style="width: max-content;">
+                   
+                </section>
+
             </form>
 
         </main>
@@ -725,10 +727,20 @@
 
                         const data = await response.json();
                         this.status = data.status;
-                        console.log(data.status);
+                        console.log(data)
 
                         if (data.status === 'completed') {
                             this.downloadUrl = data.download_url;
+
+                            let html = '';
+                            (data.image_urls || []).forEach(image_url => {
+                                html += `<div class="px-2">
+                                    <img src="${image_url}" alt="Product image" class="h-40 w-full rounded-lg object-cover border border-slate-700" loading="lazy">
+                                </div>`;
+                            });
+
+                            document.querySelector('.image_show').innerHTML = html;
+
                             this.polling = false;
                             return;
                         }
@@ -742,7 +754,7 @@
                         setTimeout(() => this.pollStatus(), 3000);
 
                     } catch (err) {
-                        this.errorMessage = 'Lost connection while checking status.';
+                        this.errorMessage = err;
                         this.polling = false;
                     }
                 },

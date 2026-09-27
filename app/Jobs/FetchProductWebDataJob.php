@@ -2,64 +2,55 @@
 
 namespace App\Jobs;
 
+use App\Helpers\SerpApiHelper;
+use App\Models\ProductdetailsResponse;
+use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class FetchProductWebDataJob implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct(
+        private ResearchRequest $research,
+        private array $request
+    ) {}
 
     public function handle(): void
     {
-        $prompt = <<<'PROMPT'
-Tell me briefly about Ashirvaad Atta.
-Return JSON only.
-PROMPT;
+        foreach ($this->request['requirements'] as $requirement) {
+            if ($requirement === 'photo') {
+                $query = $this->imagesSearchQuery();
 
-        $response = Http::timeout(60)
-            ->withHeaders([
-                'x-goog-api-key' => config('ai.providers.gemini.key'),
-                'Content-Type' => 'application/json',
-            ])
-            ->post(
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent',
-                [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                [
-                                    'text' => $prompt,
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            );
+                $response = SerpApiHelper::search($query);
 
-        if ($response->failed()) {
-            Log::error('Gemini request failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
+                ProductdetailsResponse::query()->updateOrCreate([
+                    'research_request_id' => $this->research->id
+                ], [
+                    'recent_photo' => collect($response['images_results'] ?? [])->pluck('thumbnail')->toArray()
+                ]);
 
-            return;
+                $this->research->update([
+                    'status' => 'completed'
+                ]);
+            }
         }
+    }
 
-        $data = $response->json();
-
-        Log::info('Gemini response', [
-            'response' => $data,
-        ]);
-
-        $text = data_get(
-            $data,
-            'candidates.0.content.parts.0.text'
-        );
-
-        Log::info('Gemini text', [
-            'text' => $text,
-        ]);
+    private function imagesSearchQuery(): array
+    {
+        return [
+            "engine" => "google_images",
+            "q" => $this->request['product_name'],
+            "imgar" => "s",
+            "google_domain" => "google.co.in",
+            "gl" => "in",
+            "hl" => "en",
+            "location" => $this->request['country']
+        ];
     }
 }

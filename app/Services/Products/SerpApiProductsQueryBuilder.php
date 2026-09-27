@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Products;
 
-class SerpApiQueryBuilder
+class SerpApiProductsQueryBuilder
 {
     public static function forProduct(string $subject, array $filters): array
     {
@@ -46,4 +46,5 @@ class SerpApiQueryBuilder
             default => 'us',
         };
     }
+    
 }
