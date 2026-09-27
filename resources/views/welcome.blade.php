@@ -56,7 +56,7 @@
                 @submit.prevent="submitForm($event)"
                 action="{{ route('ai-request.store') }}"
                 method="POST"
-                class="space-y-5">
+                class="space-y-5 overflow-hidden">
 
                 @csrf
 
@@ -609,7 +609,7 @@
                     </a>
                 </div>
 
-                <section class="flex gap-2 items-center image_show" style="width: max-content;">
+                <section class="flex gap-2.5 items-center image_show overflow-x-auto">
                    
                 </section>
 
@@ -734,9 +734,9 @@
 
                             let html = '';
                             (data.image_urls || []).forEach(image_url => {
-                                html += `<div class="px-2">
+                                html += `
                                     <img src="${image_url}" alt="Product image" class="h-40 w-full rounded-lg object-cover border border-slate-700" loading="lazy">
-                                </div>`;
+                                `;
                             });
 
                             document.querySelector('.image_show').innerHTML = html;
