@@ -1,11 +1,9 @@
 <?php
 
 use App\Http\Controllers\ResearchRequestController;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    Artisan::call('queue:work', ['--stop-when-empty' => true]);
     return view('welcome');
 });
 
