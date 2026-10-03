@@ -139,8 +139,8 @@
                                         Country
                                     </label>
 
-                                    <select name="country" class="field-input">
-                                        <option>India</option>
+                                    <select name="country" class="field-input" id="country_field">
+                                        <option value="">Select country</option>
                                     </select>
                                 </div>
 
@@ -149,8 +149,8 @@
                                         State
                                     </label>
 
-                                    <select name="state" class="field-input">
-                                        <option>West Bengal</option>
+                                    <select name="state" class="field-input" id="state_field">
+                                        <option value="">Select state</option>
                                     </select>
                                 </div>
 
@@ -159,8 +159,8 @@
                                         District
                                     </label>
 
-                                    <select name="district" class="field-input">
-                                        <option>Kolkata</option>
+                                    <select name="district" class="field-input" id="district_field">
+                                        <option value="">Select district</option>
                                     </select>
                                 </div>
 
@@ -423,6 +423,77 @@
                 },
             };
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCountries();
+        });
+
+        async function loadCountries() {
+            try {
+                const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+                    headers: {
+                        'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const countries = await response.json();
+                const select = document.getElementById('country_field');
+
+                select.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select country</option>' +
+                    countries.map(c => `<option class="bg-slate-900 text-sm" ${c.iso2 === 'IN' ? 'selected' : ''} value="${c.iso2}">${c.name}</option>`).join('');
+
+                select.dispatchEvent(new Event('change'));
+            } catch (err) {
+                console.error('Failed to load countries:', err);
+            }
+        }
+
+        document.getElementById('country_field').addEventListener('change', async (e) => {
+            const iso2 = e.target.value;
+            const stateSelect = document.getElementById('state_field');
+            stateSelect.setAttribute('disabled', 'disabled');
+            stateSelect.length = 1;
+
+            if (!iso2) return;
+
+            const response = await fetch(
+                `https://api.countrystatecity.in/v1/countries/${iso2}/states`, {
+                    headers: {
+                        'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
+                    }
+                }
+            );
+            const states = await response.json();
+
+            stateSelect.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select state</option>' +
+                states.map(s => `<option class="bg-slate-900 text-sm" value="${s.iso2}">${s.name}</option>`).join('');
+            stateSelect.removeAttribute('disabled');
+        });
+
+        document.getElementById('state_field').addEventListener('change', async (e) => {
+            const stateCode = e.target.value;
+            const countryCode = document.getElementById('country_field').value;
+            const citySelect = document.getElementById('district_field');
+            citySelect.setAttribute('disabled', 'disabled');
+            citySelect.length = 1;
+
+            if (!countryCode || !stateCode) return;
+
+            const response = await fetch(
+                `https://api.countrystatecity.in/v1/countries/${countryCode}/states/${stateCode}/cities`, {
+                    headers: {
+                        'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
+                    }
+                }
+            );
+            const cities = await response.json();
+
+            citySelect.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select district</option>' +
+                cities.map(c => `<option class="bg-slate-900 text-sm" value="${c.name}">${c.name}</option>`).join('');
+            citySelect.removeAttribute('disabled');
+        });
     </script>
 
 </body>
