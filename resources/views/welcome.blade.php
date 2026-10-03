@@ -64,29 +64,52 @@
                 {{-- SEARCH TYPE --}}
                 {{-- ========================================== --}}
 
-                <section class="rounded-xl border border-slate-800 bg-[#111827]">
+                <div class="flex flex-col lg:flex-row w-full gap-3">
+                    <section class="rounded-xl border border-slate-800 bg-[#111827] w-1/3">
 
-                    <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
-                            Research Type
-                        </p>
-                    </div>
+                        <div class="border-b border-slate-800 px-5 py-3.5">
+                            <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                                Search Type
+                            </p>
+                        </div>
 
-                    <div class="p-4 w-full">
+                        <div class="p-4 w-full">
 
-                        <select
-                            x-model="type"
-                            name="type"
-                            class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <select
+                                name="type"
+                                class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
 
-                            <option value="product">Product — Product, price & seller information</option>
-                            <option value="service">Service — Find services by PIN code</option>
+                                <option value="product">Service</option>
+                                <option value="service">Seller</option>
 
-                        </select>
+                            </select>
 
-                    </div>
+                        </div>
 
-                </section>
+                    </section>
+                    <section class="rounded-xl border border-slate-800 bg-[#111827] w-2/3">
+
+                        <div class="border-b border-slate-800 px-5 py-3.5">
+                            <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                                Product Information
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col lg:flex-row">
+                            <div class="p-4 w-full">
+
+                                <input type="text" id="product_category" name="product_category" placeholder="Category" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                            </div>
+                            <div class="p-4 w-full">
+
+                                <input type="text" id="product_name" name="product_name" placeholder="Product Name" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                            </div>
+                        </div>
+
+                    </section>
+                </div>
 
 
                 {{-- ========================================== --}}
@@ -94,54 +117,20 @@
                 {{-- ========================================== --}}
 
                 <section
-                    x-show="type === 'product'"
                     class="rounded-xl border border-slate-800 bg-[#111827]">
 
                     <div class="border-b border-slate-800 px-5 py-3.5">
                         <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
-                            Product Information
+                            Search Location
                         </p>
                     </div>
 
 
                     <div class="space-y-5 p-5">
 
-                        {{-- Product fields --}}
-                        <div class="grid grid-cols-2 gap-4">
-
-                            <div>
-                                <label class="field-label">
-                                    Product / Brand
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="product_name"
-                                    placeholder="e.g. Ashirvaad Atta"
-                                    class="field-input">
-                            </div>
-
-                            <div>
-                                <label class="field-label">
-                                    Search Keyword
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="product_keyword"
-                                    placeholder="e.g. Ashirvaad Whole Wheat Atta 5kg"
-                                    class="field-input">
-                            </div>
-
-                        </div>
-
 
                         {{-- LOCATION --}}
                         <div>
-
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                Search Location
-                            </p>
 
                             <div class="grid grid-cols-5 gap-3">
 
@@ -177,7 +166,7 @@
 
                                 <div>
                                     <label class="field-label">
-                                        Block / Area
+                                        Block
                                     </label>
 
                                     <input
@@ -204,63 +193,31 @@
 
                         </div>
 
+                    </div>
 
-                        {{-- INFORMATION --}}
-                        <div>
+                </section>
 
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                Information Required
-                            </p>
+                <section
+                    class="rounded-xl border border-slate-800 bg-[#111827]">
 
-                            <div class="flex flex-wrap gap-2">
+                    <div class="border-b border-slate-800 px-5 py-3.5">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                            Preferred Sources
+                        </p>
+                    </div>
 
-                                @foreach([
-                                'photo' => 'Recent Photo',
-                                'video' => 'Product Video',
-                                'price' => 'Product Rate',
-                                'comparison' => 'Price Comparison',
-                                'feedback' => 'Feedback',
-                                'seller' => 'Seller',
-                                'address' => 'Seller Address',
-                                'contact' => 'Seller Contact',
-                                'website' => 'Website',
-                                'availability' => 'Availability',
-                                ] as $value => $label)
 
-                                <label class="cursor-pointer">
-
-                                    <input
-                                        type="checkbox"
-                                        name="requirements[]"
-                                        value="{{ $value }}"
-                                        class="peer sr-only">
-
-                                    <span class="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-[11px] text-slate-400 transition peer-checked:border-blue-500 peer-checked:bg-blue-500/10 peer-checked:text-blue-300">
-                                        {{ $label }}
-                                    </span>
-
-                                </label>
-
-                                @endforeach
-
-                            </div>
-
-                        </div>
+                    <div class="space-y-5 p-5">
 
 
                         {{-- SOURCES --}}
                         <div>
 
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                Preferred Sources
-                            </p>
-
                             <div class="flex flex-wrap gap-2">
 
                                 @foreach([
                                 'search' => 'Search Engines',
-                                'ecommerce' => 'E-commerce',
-                                'news' => 'News'
+                                'ecommerce' => 'E-commerce'
                                 ] as $value => $label)
 
                                 <label class="cursor-pointer">
@@ -280,300 +237,6 @@
                                 @endforeach
 
                             </div>
-
-                        </div>
-
-
-                        {{-- INSTRUCTION --}}
-                        <div>
-
-                            <label class="field-label">
-                                Additional Instruction
-                            </label>
-
-                            <textarea
-                                type="text"
-                                name="instructions"
-                                placeholder="e.g. Compare current prices from reliable sources"
-                                class="field-input" style="height: 80px; padding-top: 10px;"></textarea>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                {{-- ========================================== --}}
-                {{-- SERVICE --}}
-                {{-- ========================================== --}}
-
-                <section
-                    x-show="type === 'service'"
-                    class="rounded-xl border border-slate-800 bg-[#111827]">
-
-                    <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-emerald-400">
-                            Service Information
-                        </p>
-                    </div>
-
-                    <div class="space-y-5 p-5">
-
-                        <div class="grid grid-cols-2 gap-4">
-
-                            <div>
-                                <label class="field-label">
-                                    Service Name
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="service_name"
-                                    placeholder="e.g. AC Repair"
-                                    class="field-input">
-                            </div>
-
-                            <div>
-                                <label class="field-label">
-                                    PIN Code
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="service_pincode"
-                                    maxlength="6"
-                                    placeholder="700024"
-                                    class="field-input">
-                            </div>
-
-                        </div>
-
-
-                        <div>
-
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                Service Location
-                            </p>
-
-                            <div class="grid grid-cols-4 gap-3">
-
-                                <input
-                                    type="text"
-                                    name="service_state"
-                                    placeholder="State"
-                                    class="field-input">
-
-                                <input
-                                    type="text"
-                                    name="service_district"
-                                    placeholder="District"
-                                    class="field-input">
-
-                                <input
-                                    type="text"
-                                    name="service_block"
-                                    placeholder="Block / Area"
-                                    class="field-input">
-
-                                <select
-                                    name="service_radius"
-                                    class="field-input">
-                                    <option>Exact PIN</option>
-                                    <option>5 KM</option>
-                                    <option>10 KM</option>
-                                    <option>25 KM</option>
-                                    <option>District-wide</option>
-                                </select>
-
-                            </div>
-
-                        </div>
-
-
-                        <div>
-
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                Information Required
-                            </p>
-
-                            <div class="flex flex-wrap gap-2">
-
-                                @foreach([
-                                'organization' => 'Organization',
-                                'owner' => 'Owner Name',
-                                'designation' => 'Designation',
-                                'address' => 'Address',
-                                'email' => 'Email',
-                                'mobile' => 'Mobile',
-                                'website' => 'Website',
-                                'service' => 'Service',
-                                'rate' => 'Service Rate',
-                                'person' => 'Contact Person',
-                                ] as $value => $label)
-
-                                <label class="cursor-pointer">
-
-                                    <input
-                                        type="checkbox"
-                                        name="service_requirements[]"
-                                        value="{{ $value }}"
-                                        class="peer sr-only">
-
-                                    <span class="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-[11px] text-slate-400 transition peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-300">
-                                        {{ $label }}
-                                    </span>
-
-                                </label>
-
-                                @endforeach
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                {{-- ========================================== --}}
-                {{-- CUSTOMER --}}
-                {{-- ========================================== --}}
-
-                <section
-                    x-show="type === 'customer'"
-                    class="rounded-xl border border-slate-800 bg-[#111827]">
-
-                    <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-purple-400">
-                            Customer + AI
-                        </p>
-                    </div>
-
-                    <div class="space-y-5 p-5">
-
-                        <div class="grid grid-cols-3 gap-3">
-
-                            <div>
-                                <label class="field-label">
-                                    Customer ID
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="customer_id"
-                                    placeholder="CUST-1025"
-                                    class="field-input">
-                            </div>
-
-                            <div>
-                                <label class="field-label">
-                                    Customer Name
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="customer_name"
-                                    placeholder="Customer name"
-                                    class="field-input">
-                            </div>
-
-                            <div>
-                                <label class="field-label">
-                                    Mobile
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="customer_mobile"
-                                    placeholder="Mobile number"
-                                    class="field-input">
-                            </div>
-
-                        </div>
-
-
-                        <div>
-
-                            <p class="mb-3 text-[15px] font-semibold text-slate-300">
-                                AI Action
-                            </p>
-
-                            <div class="flex flex-wrap gap-2">
-
-                                @foreach([
-                                'profile' => 'Customer Profile',
-                                'transactions' => 'Transactions',
-                                'analysis' => 'Data Analysis',
-                                'due' => 'Due Calculation',
-                                'warning' => 'Warning / Reminder',
-                                'notification' => 'Notification',
-                                'whatsapp' => 'WhatsApp',
-                                'telegram' => 'Telegram',
-                                'email' => 'Email Promotion',
-                                'content' => 'AI Content',
-                                ] as $value => $label)
-
-                                <label class="cursor-pointer">
-
-                                    <input
-                                        type="checkbox"
-                                        name="customer_actions[]"
-                                        value="{{ $value }}"
-                                        class="peer sr-only">
-
-                                    <span class="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-[11px] text-slate-400 transition peer-checked:border-purple-500 peer-checked:bg-purple-500/10 peer-checked:text-purple-300">
-                                        {{ $label }}
-                                    </span>
-
-                                </label>
-
-                                @endforeach
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <div>
-                                <label class="field-label">
-                                    From Date
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="date_from"
-                                    class="field-input">
-                            </div>
-
-                            <div>
-                                <label class="field-label">
-                                    To Date
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="date_to"
-                                    class="field-input">
-                            </div>
-
-                        </div>
-
-
-                        <div>
-
-                            <label class="field-label">
-                                Ask AI
-                            </label>
-
-                            <input
-                                type="text"
-                                name="question"
-                                placeholder="e.g. Show total purchase and outstanding due for the last 6 months"
-                                class="field-input">
 
                         </div>
 
@@ -610,7 +273,7 @@
                 </div>
 
                 <section class="flex gap-2.5 items-center image_show overflow-x-auto">
-                   
+
                 </section>
 
             </form>
