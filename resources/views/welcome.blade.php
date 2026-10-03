@@ -166,18 +166,6 @@
 
                                 <div>
                                     <label class="field-label">
-                                        Block
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="block"
-                                        placeholder="Garden Reach"
-                                        class="field-input">
-                                </div>
-
-                                <div>
-                                    <label class="field-label">
                                         PIN Code
                                     </label>
 
@@ -188,6 +176,19 @@
                                         placeholder="700024"
                                         class="field-input">
                                 </div>
+
+                                <div>
+                                    <label class="field-label">
+                                        Block
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="block"
+                                        placeholder="Garden Reach"
+                                        class="field-input">
+                                </div>
+
 
                             </div>
 
