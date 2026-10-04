@@ -31,7 +31,7 @@ class ResearchFromEcommerceJob implements ShouldQueue
 
             $params = array_filter([
                 'token'    => config('services.scrapedoapi.api_key'),
-                'category' => "electronics",
+                'category' => $this->category,
                 'geocode'  => 'in',
                 'type'     => 'bestsellers',
                 'page'     => 1,

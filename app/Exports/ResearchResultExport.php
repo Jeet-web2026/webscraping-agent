@@ -55,7 +55,7 @@ class ResearchResultExport implements FromArray, WithHeadings, ShouldAutoSize, W
     {
         return [
             $i + 1,                                  // Number of Records
-            null,                                    // Brand Name: not in the response
+            $item['title'],                                    // Brand Name: not in the response
             $item['imageUrl'] ?? null,               // Recent Photo
             null,                                    // Product Video: not in the response
             data_get($item, 'price.amount'),         // Product Rate
