@@ -31,16 +31,15 @@ class ResearchFromEcommerceJob implements ShouldQueue
 
             $params = array_filter([
                 'token'    => config('services.scrapedoapi.api_key'),
-                'category' => $this->category,
+                'keyword' => $record->user_prompt,
                 'geocode'  => 'in',
-                'type'     => 'bestsellers',
                 'page'     => 1,
                 'zipcode'  => $this->pincode,
             ]);
 
             $response = Http::timeout(120)
                 ->retry(3, 100)
-                ->get(config('services.scrapedoapi.base_url') . '/amazon/bestsellers', $params)
+                ->get(config('services.scrapedoapi.base_url') . '/amazon/search', $params)
                 ->throw()
                 ->json();
 
