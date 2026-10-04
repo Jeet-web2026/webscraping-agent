@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>AI Research</title>
+    <title>Web Research</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -32,12 +32,8 @@
 
                 <div>
                     <h1 class="text-[17px] font-semibold tracking-tight">
-                        AI Research
+                        Web Research
                     </h1>
-
-                    <p class="text-[11px] text-slate-400">
-                        Internet & customer intelligence
-                    </p>
                 </div>
 
             </div>
@@ -63,10 +59,11 @@
                 <section
                     class="rounded-xl border border-slate-800 bg-[#111827]">
 
-                    <div class="border-b border-slate-800 px-5 py-3.5">
+                    <div class="border-b border-slate-800 px-5 py-3.5 flex items-center gap-1">
                         <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
                             Preferred Sources
                         </p>
+                        <span class="text-red-500">*</span>
                     </div>
 
 
@@ -114,10 +111,11 @@
                 <div class="flex flex-col lg:flex-row w-full gap-3">
                     <section class="rounded-xl border border-slate-800 bg-[#111827] w-1/3">
 
-                        <div class="border-b border-slate-800 px-5 py-3.5">
+                        <div class="border-b border-slate-800 px-5 py-3.5 flex items-center gap-1">
                             <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
                                 Search Type
                             </p>
+                            <span class="text-red-500">*</span>
                         </div>
 
                         <div class="p-4 w-full">
@@ -136,14 +134,15 @@
                     </section>
                     <section class="rounded-xl border border-slate-800 bg-[#111827] w-2/3">
 
-                        <div class="border-b border-slate-800 px-5 py-3.5">
+                        <div class="border-b border-slate-800 px-5 py-3.5 flex items-center gap-1">
                             <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
                                 Product Information
                             </p>
+                            <span class="text-red-500">*</span>
                         </div>
 
                         <div class="flex flex-col lg:flex-row">
-                            <div class="p-4 w-full">
+                            <div class="p-4 w-full pe-0">
 
                                 {{-- Used for Search Engines --}}
                                 <input type="text" id="product_category_text" name="product_category"
@@ -188,7 +187,7 @@
                     </div>
 
 
-                    <div class="space-y-5 p-5">
+                    <div class="space-y-2 p-5">
 
 
                         {{-- LOCATION --}}
@@ -199,6 +198,7 @@
                                 <div>
                                     <label class="field-label">
                                         Country
+                                        <span class="text-red-500">*</span>
                                     </label>
 
                                     <select name="country" class="field-input" id="country_field">
@@ -209,6 +209,7 @@
                                 <div>
                                     <label class="field-label">
                                         State
+                                        <span class="text-red-500">*</span>
                                     </label>
 
                                     <select name="state" class="field-input" id="state_field">
@@ -219,6 +220,7 @@
                                 <div>
                                     <label class="field-label">
                                         District
+                                        <span class="text-red-500">*</span>
                                     </label>
 
                                     <select name="district" class="field-input" id="district_field">
@@ -229,6 +231,7 @@
                                 <div>
                                     <label class="field-label">
                                         PIN Code
+                                        <span class="text-red-500">*</span>
                                     </label>
 
                                     <input
@@ -255,6 +258,7 @@
                             </div>
 
                         </div>
+                        <span class="text-gray-500 text-xs">Note: If you give block information, it will be used to refine the search results.</span>
 
                     </div>
 
@@ -277,8 +281,8 @@
                     <button
                         type="submit"
                         :disabled="loading || polling"
-                        class="h-9 rounded-md bg-blue-600 px-5 text-[15px] font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50">
-                        <span x-text="loading ? 'Submitting…' : (polling ? 'Working…' : 'Search with AI')"></span>
+                        class="h-9 rounded-md bg-blue-600 px-5 text-[15px] cursor-pointer font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50">
+                        <span x-text="loading ? 'Submitting…' : (polling ? 'Working…' : 'Search')"></span>
                     </button>
                 </div>
 
