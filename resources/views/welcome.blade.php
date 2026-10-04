@@ -79,8 +79,8 @@
                                 name="type"
                                 class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
 
-                                <option value="product">Service</option>
-                                <option value="service">Seller</option>
+                                <option value="service">Service</option>
+                                <option value="seller">Seller</option>
 
                             </select>
 
@@ -443,7 +443,7 @@
                 const select = document.getElementById('country_field');
 
                 select.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select country</option>' +
-                    countries.map(c => `<option class="bg-slate-900 text-sm" ${c.iso2 === 'IN' ? 'selected' : ''} value="${c.iso2}">${c.name}</option>`).join('');
+                    countries.map(c => `<option class="bg-slate-900 text-sm" ${c.iso2 === 'IN' ? 'selected' : ''} data-value="${c.iso2}" value="${c.name}">${c.name}</option>`).join('');
 
                 select.dispatchEvent(new Event('change'));
             } catch (err) {
@@ -452,7 +452,7 @@
         }
 
         document.getElementById('country_field').addEventListener('change', async (e) => {
-            const iso2 = e.target.value;
+            const iso2 = e.target.selectedOptions[0]?.dataset.value; 
             const stateSelect = document.getElementById('state_field');
             stateSelect.setAttribute('disabled', 'disabled');
             stateSelect.length = 1;
@@ -469,13 +469,13 @@
             const states = await response.json();
 
             stateSelect.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select state</option>' +
-                states.map(s => `<option class="bg-slate-900 text-sm" value="${s.iso2}">${s.name}</option>`).join('');
+                states.map(s => `<option class="bg-slate-900 text-sm" data-value="${s.iso2}" value="${s.name}">${s.name}</option>`).join('');
             stateSelect.removeAttribute('disabled');
         });
 
         document.getElementById('state_field').addEventListener('change', async (e) => {
-            const stateCode = e.target.value;
-            const countryCode = document.getElementById('country_field').value;
+            const stateCode = e.target.selectedOptions[0]?.dataset.value; 
+            const countryCode = document.getElementById('country_field').selectedOptions[0]?.dataset.value;
             const citySelect = document.getElementById('district_field');
             citySelect.setAttribute('disabled', 'disabled');
             citySelect.length = 1;

@@ -18,16 +18,49 @@ class ResearchResultExport implements FromArray, WithHeadings, ShouldAutoSize, W
         $result = $this->researchRequest->result;
 
         if (is_string($result)) {
-            $decoded = json_decode($result, true);
-            $result = json_last_error() === JSON_ERROR_NONE ? $decoded : [[$result]];
+            $result = json_decode($result, true);
         }
 
-        return $result;
+        if (! is_array($result)) {
+            return [];
+        }
+
+        $items = $result['result'] ?? $result;
+
+        return collect($items)
+            ->filter(fn($item) => is_array($item))
+            ->values()
+            ->map(fn(array $item, int $i) => [
+                $i + 1,                         // Number of Records
+                $item['type'] ?? null,           // Brand Name
+                $item['thumbnail'] ?? null,     // Recent Photo
+                null,                           // Product Video
+                $item['price'] ?? null,         // Product Rate
+                $item['reviews'] ?? null,       // Feedback
+                $item['title'] ?? null,         // Seller Name
+                $item['address'] ?? null,       // Seller Address
+                $item['phone'] ?? null,         // Seller Contact
+                $item['website'] ?? null,       // Website
+                $item['rating'] ?? null,        // Seller Rating
+            ])
+            ->all();
     }
 
     public function headings(): array
     {
-        return ['Result'];
+        return [
+            'Number of Records',
+            'Brand Name',
+            'Recent Photo',
+            'Product Video',
+            'Product Rate',
+            'Feedback',
+            'Seller Name',
+            'Seller Address',
+            'Seller Contact',
+            'Website',
+            'Seller Rating',
+        ];
     }
 
     public function styles(Worksheet $sheet): array

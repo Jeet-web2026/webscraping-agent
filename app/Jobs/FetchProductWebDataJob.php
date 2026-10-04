@@ -22,8 +22,8 @@ class FetchProductWebDataJob implements ShouldQueue
 
     public function handle(): void
     {
-        foreach ($this->request['requirements'] as $requirement) {
-            if ($requirement === 'photo') {
+        foreach ($this->research->filters['requirements'] as $requirement) {
+            if ($requirement === 'Recent Photo') {
                 $query = $this->imagesSearchQuery();
 
                 $response = SerpApiHelper::search($query);

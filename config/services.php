@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'scrapedoapi' => [
+        'api_key' => env('SCRAPEDOAPI_API_KEY'),
+        'base_url' => env('SCRAPEDOAPI_BASE_URL'),
+    ],
+
 ];

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ResearchResultExport;
 use App\Http\Requests\StoreAiRequest;
+use App\Jobs\FetchOtherDetailsJob;
 use App\Jobs\FetchProductWebDataJob;
 use App\Jobs\ResearchAgentJob;
 use App\Models\ResearchRequest;
@@ -22,9 +23,8 @@ class ResearchRequestController extends Controller
         $data = $request->validated();
 
         $compacted = match ($data['type']) {
-            'product' => $this->compactProduct($data),
-            'service' => $this->compactService($data),
-            'customer' => $this->compactCustomer($data),
+            'seller' => $this->compactProduct($data),
+            'service' => $this->compactService($data)
         };
 
         $record = ResearchRequest::create([
@@ -35,12 +35,12 @@ class ResearchRequestController extends Controller
             'status' => 'pending',
         ]);
 
-        if ($data['type'] === 'product') {
-            Bus::chain([
-                new ResearchAgentJob($record->id),
-                new FetchProductWebDataJob($record, $data)
-            ])->dispatch();
-        }
+
+        Bus::chain([
+            new ResearchAgentJob($record->id),
+            new FetchOtherDetailsJob($record),
+            new FetchProductWebDataJob($record, $data)
+        ])->dispatch();
 
         return response()->json([
             'id' => $record->id,
@@ -52,10 +52,10 @@ class ResearchRequestController extends Controller
     protected function compactProduct(array $d): array
     {
         return [
-            'subject' => $d['product_name'],
+            'subject' => $d['product_name'] . '  ' . $d['product_category'],
             'filters' => [
                 'type' => 'product',
-                'keyword' => $d['product_keyword'] ?? null,
+                'keyword' => $d['product_category'] ?? null,
                 'location' => array_filter([
                     'country' => $d['country'] ?? null,
                     'state' => $d['state'] ?? null,
@@ -63,15 +63,10 @@ class ResearchRequestController extends Controller
                     'block' => $d['block'] ?? null,
                     'pincode' => $d['pincode'] ?? null,
                 ]),
-                'requirements' => $d['requirements'] ?? [],
-                'sources' => $d['sources'] ?? [],
+                'requirements' => array_map('trim', explode(',', "Number of records, Brand Name, Recent Photo, Prduct Video, Product Rate, Feedback, Seller Name, Seller Address, Seller Contact, Website, Seller rating")),
+                'sources' => $d['source'] ?? [],
             ],
-            'user_prompt' => $this->buildPrompt(
-                "Find product information for: {$d['product_name']}",
-                $d['product_keyword'] ?? null,
-                $d['requirements'] ?? [],
-                $d['instructions'] ?? null,
-            ),
+            'user_prompt' => "Search {$d['product_name']} {$d['product_category']} in {$d['block']}, {$d['district']}, {$d['state']}, {$d['country']}, PIN: {$d['pincode']}"
         ];
     }
 
@@ -138,7 +133,7 @@ class ResearchRequestController extends Controller
         $researchRequest->load(
             'productDetails'
         );
-        
+
         return response()->json([
             'status' => $researchRequest->status,
             'model_used' => $researchRequest->model_used,
