@@ -449,6 +449,16 @@
         });
 
         async function loadCountries() {
+            const select = document.getElementById('country_field');
+            const optionClass = 'bg-slate-900 text-sm';
+
+            const setIndiaDefault = () => {
+                select.innerHTML =
+                    `<option class="${optionClass}" value="">Select country</option>` +
+                    `<option class="${optionClass}" selected data-value="IN" value="India">India</option>`;
+                select.dispatchEvent(new Event('change'));
+            };
+
             try {
                 const response = await fetch('https://api.countrystatecity.in/v1/countries', {
                     headers: {
@@ -456,19 +466,34 @@
                     }
                 });
 
+                if (response.status === 429) {
+                    console.warn('Rate limit hit (429). Defaulting to India.');
+                    setIndiaDefault();
+                    return;
+                }
+
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const countries = await response.json();
-                const select = document.getElementById('country_field');
 
-                select.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select country</option>' +
-                    countries.map(c => `<option class="bg-slate-900 text-sm" ${c.iso2 === 'IN' ? 'selected' : ''} data-value="${c.iso2}" value="${c.name}">${c.name}</option>`).join('');
+                select.innerHTML =
+                    `<option class="${optionClass}" value="">Select country</option>` +
+                    countries.map(c =>
+                        `<option class="${optionClass}" ${c.iso2 === 'IN' ? 'selected' : ''} data-value="${c.iso2}" value="${c.name}">${c.name}</option>`
+                    ).join('');
 
                 select.dispatchEvent(new Event('change'));
             } catch (err) {
                 console.error('Failed to load countries:', err);
+                setIndiaDefault();
             }
         }
+
+        const OPT_CLASS = 'bg-slate-900 text-sm';
+        const API_BASE = 'https://api.countrystatecity.in/v1';
+        const API_HEADERS = {
+            'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
+        };
 
         document.getElementById('country_field').addEventListener('change', async (e) => {
             const iso2 = e.target.selectedOptions[0]?.dataset.value;
@@ -478,18 +503,44 @@
 
             if (!iso2) return;
 
-            const response = await fetch(
-                `https://api.countrystatecity.in/v1/countries/${iso2}/states`, {
-                    headers: {
-                        'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
-                    }
-                }
-            );
-            const states = await response.json();
+            const setWestBengalDefault = () => {
+                stateSelect.innerHTML =
+                    `<option class="${OPT_CLASS}" value="">Select state</option>` +
+                    `<option class="${OPT_CLASS}" selected data-value="WB" value="West Bengal">West Bengal</option>`;
+                stateSelect.removeAttribute('disabled');
+                stateSelect.dispatchEvent(new Event('change')); // triggers city load
+            };
 
-            stateSelect.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select state</option>' +
-                states.map(s => `<option class="bg-slate-900 text-sm" data-value="${s.iso2}" value="${s.name}">${s.name}</option>`).join('');
-            stateSelect.removeAttribute('disabled');
+            try {
+                const response = await fetch(`${API_BASE}/countries/${iso2}/states`, {
+                    headers: API_HEADERS
+                });
+
+                if (response.status === 429) {
+                    console.warn('Rate limit hit (429) on states.');
+                    if (iso2 === 'IN') setWestBengalDefault();
+                    else stateSelect.removeAttribute('disabled');
+                    return;
+                }
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const states = await response.json();
+
+                stateSelect.innerHTML =
+                    `<option class="${OPT_CLASS}" value="">Select state</option>` +
+                    states.map(s =>
+                        `<option class="${OPT_CLASS}" ${iso2 === 'IN' && s.iso2 === 'WB' ? 'selected' : ''} data-value="${s.iso2}" value="${s.name}">${s.name}</option>`
+                    ).join('');
+                stateSelect.removeAttribute('disabled');
+
+                // Optional: auto-load cities when West Bengal is preselected
+                if (stateSelect.value) stateSelect.dispatchEvent(new Event('change'));
+            } catch (err) {
+                console.error('Failed to load states:', err);
+                if (iso2 === 'IN') setWestBengalDefault();
+                else stateSelect.removeAttribute('disabled');
+            }
         });
 
         document.getElementById('state_field').addEventListener('change', async (e) => {
@@ -501,18 +552,44 @@
 
             if (!countryCode || !stateCode) return;
 
-            const response = await fetch(
-                `https://api.countrystatecity.in/v1/countries/${countryCode}/states/${stateCode}/cities`, {
-                    headers: {
-                        'X-CSCAPI-KEY': 'b0f3fbe2ab09c333b8fd2d0a64da260ff657f320ca3e3a5db7d1f987d8251829'
-                    }
-                }
-            );
-            const cities = await response.json();
+            const setKolkataDefault = () => {
+                citySelect.innerHTML =
+                    `<option class="${OPT_CLASS}" value="">Select district</option>` +
+                    `<option class="${OPT_CLASS}" selected value="Kolkata">Kolkata</option>`;
+                citySelect.removeAttribute('disabled');
+            };
 
-            citySelect.innerHTML = '<option class="bg-slate-900 text-sm" value="">Select district</option>' +
-                cities.map(c => `<option class="bg-slate-900 text-sm" value="${c.name}">${c.name}</option>`).join('');
-            citySelect.removeAttribute('disabled');
+            const isWestBengal = countryCode === 'IN' && stateCode === 'WB';
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/countries/${countryCode}/states/${stateCode}/cities`, {
+                        headers: API_HEADERS
+                    }
+                );
+
+                if (response.status === 429) {
+                    console.warn('Rate limit hit (429) on cities.');
+                    if (isWestBengal) setKolkataDefault();
+                    else citySelect.removeAttribute('disabled');
+                    return;
+                }
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const cities = await response.json();
+
+                citySelect.innerHTML =
+                    `<option class="${OPT_CLASS}" value="">Select district</option>` +
+                    cities.map(c =>
+                        `<option class="${OPT_CLASS}" ${isWestBengal && c.name === 'Kolkata' ? 'selected' : ''} value="${c.name}">${c.name}</option>`
+                    ).join('');
+                citySelect.removeAttribute('disabled');
+            } catch (err) {
+                console.error('Failed to load cities:', err);
+                if (isWestBengal) setKolkataDefault();
+                else citySelect.removeAttribute('disabled');
+            }
         });
 
         const sourceRadios = document.querySelectorAll('input[name="source"]');

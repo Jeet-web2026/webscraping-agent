@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAiRequest;
 use App\Jobs\FetchOtherDetailsJob;
 use App\Jobs\FetchProductWebDataJob;
 use App\Jobs\ResearchAgentJob;
+use App\Jobs\ResearchFromEcommerceBusinessRelatedDetailsJob;
 use App\Jobs\ResearchFromEcommerceJob;
 use App\Models\ResearchRequest;
 use Illuminate\Http\JsonResponse;
@@ -49,6 +50,7 @@ class ResearchRequestController extends Controller
                     $request->product_category,
                     $request->pincode,
                 ),
+                // new ResearchFromEcommerceBusinessRelatedDetailsJob($record),
                 new FetchProductWebDataJob($record, $data)
             ])->dispatch();
         }

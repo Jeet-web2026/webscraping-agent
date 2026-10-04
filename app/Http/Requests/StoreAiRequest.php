@@ -20,7 +20,7 @@ class StoreAiRequest extends FormRequest
             'country' => 'required|string',
             'state' => 'required|string',
             'district' => 'required|string',
-            'block' => 'required|string',
+            'block' => 'nullable|string',
             'pincode' => 'nullable|digits:6',
             'source' => 'required|string',
         ];
