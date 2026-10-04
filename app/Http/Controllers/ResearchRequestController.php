@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAiRequest;
 use App\Jobs\FetchOtherDetailsJob;
 use App\Jobs\FetchProductWebDataJob;
 use App\Jobs\ResearchAgentJob;
+use App\Jobs\ResearchFromEcommerceJob;
 use App\Models\ResearchRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -35,12 +36,22 @@ class ResearchRequestController extends Controller
             'status' => 'pending',
         ]);
 
-
-        Bus::chain([
-            new ResearchAgentJob($record->id),
-            new FetchOtherDetailsJob($record),
-            new FetchProductWebDataJob($record, $data)
-        ])->dispatch();
+        if ($data['source'] === 'search') {
+            Bus::chain([
+                new ResearchAgentJob($record->id),
+                new FetchOtherDetailsJob($record),
+                new FetchProductWebDataJob($record, $data)
+            ])->dispatch();
+        } else {
+            Bus::chain([
+                new ResearchFromEcommerceJob(
+                    $record->id,
+                    $request->product_category,
+                    $request->pincode,
+                ),
+                new FetchProductWebDataJob($record, $data)
+            ])->dispatch();
+        }
 
         return response()->json([
             'id' => $record->id,

@@ -25,25 +25,47 @@ class ResearchResultExport implements FromArray, WithHeadings, ShouldAutoSize, W
             return [];
         }
 
-        $items = $result['result'] ?? $result;
-
-        return collect($items)
+        return collect($result['result'] ?? $result)
             ->filter(fn($item) => is_array($item))
             ->values()
-            ->map(fn(array $item, int $i) => [
-                $i + 1,                         // Number of Records
-                $item['type'] ?? null,           // Brand Name
-                $item['thumbnail'] ?? null,     // Recent Photo
-                null,                           // Product Video
-                $item['price'] ?? null,         // Product Rate
-                $item['reviews'] ?? null,       // Feedback
-                $item['title'] ?? null,         // Seller Name
-                $item['address'] ?? null,       // Seller Address
-                $item['phone'] ?? null,         // Seller Contact
-                $item['website'] ?? null,       // Website
-                $item['rating'] ?? null,        // Seller Rating
-            ])
+            ->map(fn(array $item, int $i) => isset($item['asin'])
+                ? $this->mapEcommerceItem($item, $i)
+                : $this->mapSearchItem($item, $i))
             ->all();
+    }
+
+    private function mapSearchItem(array $item, int $i): array
+    {
+        return [
+            $i + 1,                         // Number of Records
+            $item['type'] ?? null,          // Brand Name
+            $item['thumbnail'] ?? null,     // Recent Photo
+            null,                           // Product Video
+            $item['price'] ?? null,         // Product Rate
+            $item['reviews'] ?? null,       // Feedback
+            $item['title'] ?? null,         // Seller Name
+            $item['address'] ?? null,       // Seller Address
+            $item['phone'] ?? null,         // Seller Contact
+            $item['website'] ?? null,       // Website
+            $item['rating'] ?? null,        // Seller Rating
+        ];
+    }
+
+    private function mapEcommerceItem(array $item, int $i): array
+    {
+        return [
+            $i + 1,                                  // Number of Records
+            null,                                    // Brand Name: not in the response
+            $item['imageUrl'] ?? null,               // Recent Photo
+            null,                                    // Product Video: not in the response
+            data_get($item, 'price.amount'),         // Product Rate
+            $item['reviewCount'] ?? null,            // Feedback
+            null,                                    // Seller Name: not in the response
+            null,                                    // Seller Address: not in the response
+            null,                                    // Seller Contact: not in the response
+            $item['url'] ?? null,                    // Website (Amazon product page)
+            data_get($item, 'rating.value'),         // Seller Rating (this is the product rating)
+        ];
     }
 
     public function headings(): array
