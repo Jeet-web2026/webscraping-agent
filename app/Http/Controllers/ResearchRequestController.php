@@ -73,23 +73,21 @@ class ResearchRequestController extends Controller
     protected function compactService(array $d): array
     {
         return [
-            'subject' => $d['service_name'],
+            'subject' => $d['product_name'] . '  ' . $d['product_category'],
             'filters' => [
-                'type' => 'service',
+                'type' => 'product',
+                'keyword' => $d['product_category'] ?? null,
                 'location' => array_filter([
-                    'state' => $d['service_state'] ?? null,
-                    'district' => $d['service_district'] ?? null,
-                    'block' => $d['service_block'] ?? null,
-                    'pincode' => $d['service_pincode'] ?? null,
-                    'radius' => $d['service_radius'] ?? null,
+                    'country' => $d['country'] ?? null,
+                    'state' => $d['state'] ?? null,
+                    'district' => $d['district'] ?? null,
+                    'block' => $d['block'] ?? null,
+                    'pincode' => $d['pincode'] ?? null,
                 ]),
-                'requirements' => $d['service_requirements'] ?? [],
+                'requirements' => array_map('trim', explode(',', "Number of records, Brand Name, Recent Photo, Prduct Video, Product Rate, Feedback, Seller Name, Seller Address, Seller Contact, Website, Seller rating")),
+                'sources' => $d['source'] ?? [],
             ],
-            'user_prompt' => $this->buildPrompt(
-                "Find service providers for: {$d['service_name']}",
-                $d['service_pincode'] ?? null,
-                $d['service_requirements'] ?? [],
-            ),
+            'user_prompt' => "Search {$d['product_name']} {$d['product_category']} services in {$d['block']}, {$d['state']}, {$d['country']}, {$d['district']}: {$d['pincode']}"
         ];
     }
 
