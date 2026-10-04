@@ -60,6 +60,53 @@
 
                 @csrf
 
+                <section
+                    class="rounded-xl border border-slate-800 bg-[#111827]">
+
+                    <div class="border-b border-slate-800 px-5 py-3.5">
+                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
+                            Preferred Sources
+                        </p>
+                    </div>
+
+
+                    <div class="space-y-5 p-5">
+
+
+                        {{-- SOURCES --}}
+                        <div>
+
+                            <div class="flex flex-wrap gap-2">
+
+                                @foreach([
+                                'search' => 'Search Engines',
+                                'ecommerce' => 'E-commerce'
+                                ] as $value => $label)
+
+                                <label class="cursor-pointer">
+
+                                    <input
+                                        type="radio"
+                                        name="source"
+                                        value="{{ $value }}"
+                                        class="peer sr-only">
+
+                                    <span class="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-[11px] text-slate-400 transition peer-checked:border-blue-500 peer-checked:bg-blue-500/10 peer-checked:text-blue-300">
+                                        {{ $label }}
+                                    </span>
+
+                                </label>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
                 {{-- ========================================== --}}
                 {{-- SEARCH TYPE --}}
                 {{-- ========================================== --}}
@@ -98,7 +145,22 @@
                         <div class="flex flex-col lg:flex-row">
                             <div class="p-4 w-full">
 
-                                <input type="text" id="product_category" name="product_category" placeholder="Category" class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                {{-- Used for Search Engines --}}
+                                <input type="text" id="product_category_text" name="product_category"
+                                    value="{{ old('product_category') }}"
+                                    placeholder="Category"
+                                    class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                                {{-- Used for E-commerce --}}
+                                <select id="product_category_select" name="product_category" disabled
+                                    class="hidden w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-[13px] font-semibold text-slate-100 transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option class="bg-slate-900 text-sm" value="">Select category</option>
+                                    @foreach (config('amazon.categories') as $slug => $label)
+                                    <option class="bg-slate-900 text-sm" value="{{ $slug }}" @selected(old('product_category')===$slug)>
+                                        {{ $label }}
+                                    </option>
+                                    @endforeach
+                                </select>
 
                             </div>
                             <div class="p-4 w-full">
@@ -189,53 +251,6 @@
                                         class="field-input">
                                 </div>
 
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-                <section
-                    class="rounded-xl border border-slate-800 bg-[#111827]">
-
-                    <div class="border-b border-slate-800 px-5 py-3.5">
-                        <p class="text-[15px] font-semibold uppercase tracking-[0.08em] text-blue-400">
-                            Preferred Sources
-                        </p>
-                    </div>
-
-
-                    <div class="space-y-5 p-5">
-
-
-                        {{-- SOURCES --}}
-                        <div>
-
-                            <div class="flex flex-wrap gap-2">
-
-                                @foreach([
-                                'search' => 'Search Engines',
-                                'ecommerce' => 'E-commerce'
-                                ] as $value => $label)
-
-                                <label class="cursor-pointer">
-
-                                    <input
-                                        type="radio"
-                                        name="source"
-                                        value="{{ $value }}"
-                                        class="peer sr-only">
-
-                                    <span class="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-[11px] text-slate-400 transition peer-checked:border-blue-500 peer-checked:bg-blue-500/10 peer-checked:text-blue-300">
-                                        {{ $label }}
-                                    </span>
-
-                                </label>
-
-                                @endforeach
 
                             </div>
 
@@ -452,7 +467,7 @@
         }
 
         document.getElementById('country_field').addEventListener('change', async (e) => {
-            const iso2 = e.target.selectedOptions[0]?.dataset.value; 
+            const iso2 = e.target.selectedOptions[0]?.dataset.value;
             const stateSelect = document.getElementById('state_field');
             stateSelect.setAttribute('disabled', 'disabled');
             stateSelect.length = 1;
@@ -474,7 +489,7 @@
         });
 
         document.getElementById('state_field').addEventListener('change', async (e) => {
-            const stateCode = e.target.selectedOptions[0]?.dataset.value; 
+            const stateCode = e.target.selectedOptions[0]?.dataset.value;
             const countryCode = document.getElementById('country_field').selectedOptions[0]?.dataset.value;
             const citySelect = document.getElementById('district_field');
             citySelect.setAttribute('disabled', 'disabled');
@@ -495,6 +510,23 @@
                 cities.map(c => `<option class="bg-slate-900 text-sm" value="${c.name}">${c.name}</option>`).join('');
             citySelect.removeAttribute('disabled');
         });
+
+        const sourceRadios = document.querySelectorAll('input[name="source"]');
+        const categoryText = document.getElementById('product_category_text');
+        const categorySelect = document.getElementById('product_category_select');
+
+        function toggleCategoryField() {
+            const isEcommerce = document.querySelector('input[name="source"]:checked')?.value === 'ecommerce';
+
+            categoryText.classList.toggle('hidden', isEcommerce);
+            categoryText.disabled = isEcommerce;
+
+            categorySelect.classList.toggle('hidden', !isEcommerce);
+            categorySelect.disabled = !isEcommerce;
+        }
+
+        sourceRadios.forEach(radio => radio.addEventListener('change', toggleCategoryField));
+        toggleCategoryField();
     </script>
 
 </body>
