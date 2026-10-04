@@ -374,11 +374,12 @@
                             body: formData,
                         });
 
+                        const data = await response.json();
+
                         if (!response.ok) {
-                            throw new Error(`Request failed: ${response.status}`);
+                            throw new Error(`Request failed: ${data.message}`);
                         }
 
-                        const data = await response.json();
                         this.requestId = data.id;
                         this.status = data.status;
 
