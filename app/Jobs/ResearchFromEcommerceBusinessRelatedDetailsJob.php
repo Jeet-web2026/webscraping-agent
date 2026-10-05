@@ -23,14 +23,25 @@ class ResearchFromEcommerceBusinessRelatedDetailsJob implements ShouldQueue
             foreach ($existing['result'] ?? [] as $item) {
                 $detailedResult = Http::timeout(120)
                     ->retry(3, 100)
-                    ->get(config('services.scrapedoapi.base_url') . '/amazon/seller', [
+                    ->get(config('services.scrapedoapi.base_url') . '/amazon/pdp', [
                         'token'    => config('services.scrapedoapi.api_key'),
-                        'seller' => $item['asin'],
+                        'asin' => $item['asin'],
+                        'geocode' => "IN",
                     ])
                     ->throw()
                     ->json();
 
-                $details = $detailedResult['business_details'] ?? [];
+                $sellerId = $detailedResult['third_party_seller']['id'] ?? null;
+
+                $details = Http::timeout(120)
+                    ->retry(3, 100)
+                    ->get(config('services.scrapedoapi.base_url') . '/amazon/seller', [
+                        'token'    => config('services.scrapedoapi.api_key'),
+                        'seller' => $sellerId,
+                        'geocode' => "IN",
+                    ])
+                    ->throw()
+                    ->json();
 
                 $item['seller_name'] = $details['business_name'] ?? null . ' (business type:' . $details['business_type'] ?? null . '), (trade no:' . $details['trade_register_number'] ?? null . ')';
                 $item['contact_details']        =  "Phone:" . $details['phone_number'] ?? null . ", Email: " . $details['email'] ?? null;

@@ -44,15 +44,9 @@ class ResearchRequestController extends Controller
                 new FetchProductWebDataJob($record, $data)
             ])->dispatch();
         } else {
-            Bus::chain([
-                new ResearchFromEcommerceJob(
-                    $record->id,
-                    $request->product_category,
-                    $request->pincode,
-                ),
-                // new ResearchFromEcommerceBusinessRelatedDetailsJob($record),
-                new FetchProductWebDataJob($record, $data)
-            ])->dispatch();
+            ResearchFromEcommerceJob::dispatch($record->id, $request->product_category, $request->pincode);
+            ResearchFromEcommerceBusinessRelatedDetailsJob::dispatch($record);
+            FetchProductWebDataJob::dispatch($record, $data);
         }
 
         return response()->json([
