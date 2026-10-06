@@ -57,12 +57,12 @@ class ResearchResultExport implements FromArray, WithHeadings, ShouldAutoSize, W
             $i + 1,                                  // Number of Records
             $item['title'],                                    // Brand Name: not in the response
             $item['imageUrl'] ?? null,               // Recent Photo
-            null,                                    // Product Video: not in the response
+            $item['video'] ?? null,                                  // Product Video: not in the response
             data_get($item, 'price.amount'),         // Product Rate
             $item['reviewCount'] ?? null,            // Feedback
-            null,                                    // Seller Name: not in the response
-            null,                                    // Seller Address: not in the response
-            null,                                    // Seller Contact: not in the response
+            $item['seller_name'] ?? null,            // Seller Name: not in the response
+            $item['address'] ?? null,                // Seller Address: not in the response
+            $item['contact_details'] ?? null,                  // Seller Contact: not in the response
             $item['url'] ?? null,                    // Website (Amazon product page)
             data_get($item, 'rating.value'),         // Seller Rating (this is the product rating)
         ];
