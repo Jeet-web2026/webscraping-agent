@@ -18,6 +18,8 @@ class ResearchFromEcommerceBusinessRelatedDetailsJob implements ShouldQueue
     {
         if ($this->researchRequest->status === 'initial_completed') {
             $existing = $this->researchRequest->result ?? [];
+            $results   = [];
+            $sellerIds = [];
 
             foreach ($existing['result'] ?? [] as $item) {
                 $detailedResult = Http::timeout(120)
@@ -32,9 +34,21 @@ class ResearchFromEcommerceBusinessRelatedDetailsJob implements ShouldQueue
 
                 $sellerId = $detailedResult['third_party_seller']['id'] ?? null;
 
+                $item['seller_id'] = $sellerId;
+
                 if (!empty($sellerId)) {
-                    SearchSellerInforJob::dispatch($this->researchRequest, $sellerId);
+                    $sellerIds[$sellerId] = true;
                 }
+
+                $results[] = $item;
+            }
+
+            $this->researchRequest->update([
+                'result' => array_merge($existing, ['result' => $results]),
+            ]);
+
+            foreach (array_keys($sellerIds) as $sellerId) {
+                SearchSellerInforJob::dispatch($this->researchRequest, $sellerId);
             }
         }
     }
