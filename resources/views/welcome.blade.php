@@ -415,11 +415,18 @@
 
                         if (data.status === 'completed') {
                             this.downloadUrl = data.download_url;
-
                             let html = '';
-                            (data.image_urls || []).forEach(image_url => {
+                            const images = data.image_urls || [];
+                            const links = data.links || [];
+
+                            images.forEach((imageUrl, i) => {
+                                const link = links[i] || imageUrl;
+
                                 html += `
-                                    <img src="${image_url}" alt="Product image" class="h-40 w-full rounded-lg object-cover border border-slate-700" loading="lazy">
+                                    <a href="${link}" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
+                                        <img src="${imageUrl}" alt="Image" loading="lazy"
+                                            class="h-24 w-24 object-cover rounded-md border border-slate-700">
+                                    </a>
                                 `;
                             });
 

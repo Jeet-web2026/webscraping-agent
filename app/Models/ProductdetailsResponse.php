@@ -28,5 +28,6 @@ class ProductdetailsResponse extends Model
 
     protected $casts = [
         'recent_photo' => 'array',
+        'website'      => 'array',
     ];
 }

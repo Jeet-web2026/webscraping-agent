@@ -31,7 +31,8 @@ class FetchProductWebDataJob implements ShouldQueue
                 ProductdetailsResponse::query()->updateOrCreate([
                     'research_request_id' => $this->research->id
                 ], [
-                    'recent_photo' => collect($response['images_results'] ?? [])->pluck('thumbnail')->toArray()
+                    'recent_photo' => collect($response['images_results'] ?? [])->pluck('thumbnail')->toArray(),
+                    'website' => collect($response['suggested_searches'] ?? [])->pluck('link')->toArray()
                 ]);
 
                 $this->research->update([

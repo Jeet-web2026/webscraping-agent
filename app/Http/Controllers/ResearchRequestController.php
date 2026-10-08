@@ -145,6 +145,7 @@ class ResearchRequestController extends Controller
             'result' => $researchRequest->result,
             'error' => $researchRequest->error,
             'image_urls' => $researchRequest->productDetails?->recent_photo,
+            'links' => $researchRequest->productDetails?->website,
             'download_url' => $researchRequest->status === 'completed'
                 ? URL::temporarySignedRoute(
                     'research-requests.download',
