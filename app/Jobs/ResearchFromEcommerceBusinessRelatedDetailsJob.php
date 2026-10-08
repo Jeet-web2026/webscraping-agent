@@ -50,6 +50,10 @@ class ResearchFromEcommerceBusinessRelatedDetailsJob implements ShouldQueue
             foreach (array_keys($sellerIds) as $sellerId) {
                 SearchSellerInforJob::dispatch($this->researchRequest, $sellerId);
             }
+
+            $this->researchRequest->update([
+                'status' => 'completed'
+            ]);
         }
     }
 }
