@@ -46,7 +46,7 @@ class ResearchRequestController extends Controller
         } else {
             ResearchFromEcommerceJob::dispatch($record->id, $request->product_category, $request->pincode);
             ResearchFromEcommerceBusinessRelatedDetailsJob::dispatch($record);
-            // FetchProductWebDataJob::dispatch($record, $data);
+            FetchProductWebDataJob::dispatch($record, $data);
         }
 
         return response()->json([
