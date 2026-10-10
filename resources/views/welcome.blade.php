@@ -55,8 +55,9 @@
                 </div>
 
                 <div id="token-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 p-4">
-                    <form method="POST" action="#" class="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl  bg-slate-900 border border-gray-800 p-5 shadow-xl">
+                    <form method="POST" action="{{ url('/api-tokens') }}" class="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl  bg-slate-900 border border-gray-800 p-5 shadow-xl">
                         @csrf
+                        @method('PUT')
 
                         <h2 class="text-base font-semibold">Create / Update API token</h2>
 

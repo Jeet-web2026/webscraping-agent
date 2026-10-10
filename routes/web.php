@@ -16,3 +16,4 @@ Route::get('research-requests/{researchRequest}/download', [ResearchRequestContr
     ->middleware('signed');
 
 Route::get('/api-tokens', [ApiTokenController::class, 'index']);
+Route::put('/api-tokens', [ApiTokenController::class, 'update']);

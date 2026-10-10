@@ -13,7 +13,7 @@ interface ApiTokenRepositoryInterface
 
     public function create(string $name, string $token): array;
 
-    public function update(int $id, string $name, string $token): ?ApiToken;
+    public function update(int $id, array $data): ?ApiToken;
 
     public function regenerate(int $id): ?array;
 

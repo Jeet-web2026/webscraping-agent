@@ -34,7 +34,7 @@ class ApiTokenRepository implements ApiTokenRepositoryInterface
         ];
     }
 
-    public function update(int $id, string $name, string $token): ?ApiToken
+    public function update(int $id, array $data): ?ApiToken
     {
         $model = $this->findById($id);
 
@@ -42,12 +42,9 @@ class ApiTokenRepository implements ApiTokenRepositoryInterface
             return null;
         }
 
-        $model->update([
-            'name' => $name,
-            'token' => $token,
-        ]);
+        $model->update($data);
 
-        return $model;
+        return $model->fresh();
     }
 
     public function regenerate(int $id): ?array
