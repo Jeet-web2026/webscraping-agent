@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Interfaces\ApiTokenRepositoryInterface;
+use App\Repositories\ApiTokenRepository;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            ApiTokenRepositoryInterface::class,
+            ApiTokenRepository::class
+        );
     }
 
     /**
