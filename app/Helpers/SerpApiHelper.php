@@ -13,7 +13,7 @@ class SerpApiHelper
 
     public static function search(array $query, ApiTokenRepositoryInterface $apiTokenInterface)
     {
-        $query['api_key'] = $apiTokenInterface->findById(2)->token;
+        $query['api_key'] = $apiTokenInterface->findById(1)->token;
 
         $response = Http::timeout(60)
             ->retry(3, 2000)->get(static::$baseUrl, $query);
