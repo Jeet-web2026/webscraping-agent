@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-
+use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -22,7 +22,7 @@ class ResearchFromEcommerceJob implements ShouldQueue
         private readonly ?string $pincode = null,
     ) {}
 
-    public function handle(): void
+    public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         $record = ResearchRequest::findOrFail($this->researchRequestId);
 
@@ -30,7 +30,7 @@ class ResearchFromEcommerceJob implements ShouldQueue
             $record->update(['status' => 'processing']);
 
             $params = array_filter([
-                'token'    => config('services.scrapedoapi.api_key'),
+                'token'    => $apiTokenInterface->findById(2)->token,
                 'keyword' => $record->user_prompt,
                 'geocode'  => 'in',
                 'page'     => 1,

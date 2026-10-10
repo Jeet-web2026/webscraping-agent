@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,13 +18,13 @@ class SearchSellerInforJob implements ShouldQueue
         protected string $sellerId
     ) {}
 
-    public function handle(): void
+    public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         try {
             $details = Http::timeout(120)
                 ->retry(3, 100)
                 ->get(config('services.scrapedoapi.base_url') . '/amazon/seller', [
-                    'token' => config('services.scrapedoapi.api_key'),
+                    'token' => $apiTokenInterface->findById(2)->token,
                     'seller' => $this->sellerId,
                     'geocode' => 'IN',
                     'super' => true,

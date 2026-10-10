@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\SerpApiHelper;
+use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ProductdetailsResponse;
 use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,13 +21,13 @@ class FetchProductWebDataJob implements ShouldQueue
         private array $request
     ) {}
 
-    public function handle(): void
+    public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         foreach ($this->research->filters['requirements'] as $requirement) {
             if ($requirement === 'Recent Photo') {
                 $query = $this->imagesSearchQuery();
 
-                $response = SerpApiHelper::search($query);
+                $response = SerpApiHelper::search($query, $apiTokenInterface);
 
                 ProductdetailsResponse::query()->updateOrCreate([
                     'research_request_id' => $this->research->id

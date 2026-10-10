@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,7 +19,7 @@ class ResearchAgentJob implements ShouldQueue
 
     public function __construct(protected int $requestId) {}
 
-    public function handle(): void
+    public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         $record = ResearchRequest::findOrFail($this->requestId);
         $record->update(['status' => 'processing']);
@@ -26,7 +27,7 @@ class ResearchAgentJob implements ShouldQueue
         try {
             $query = $record->user_prompt;
 
-            $url = config('services.scrapedoapi.base_url') . '/google/maps/search' . '?token=' . config('services.scrapedoapi.api_key') . '&q=' . urlencode($query);
+            $url = config('services.scrapedoapi.base_url') . '/google/maps/search' . '?token=' . $apiTokenInterface->findById(2)->token . '&q=' . urlencode($query);
 
             $response = Http::timeout(120)
                 ->retry(3, 100)

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -13,7 +14,7 @@ class FetchOtherDetailsJob implements ShouldQueue
 
     public function __construct(private readonly ResearchRequest $researchRequest) {}
 
-    public function handle(): void
+    public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         if ($this->researchRequest->status === 'initial_completed') {
             $existing = $this->researchRequest->result ?? [];
@@ -23,7 +24,7 @@ class FetchOtherDetailsJob implements ShouldQueue
                 $detailedResult = Http::timeout(120)
                     ->retry(3, 100)
                     ->get(config('services.scrapedoapi.base_url') . '/google/maps/place', [
-                        'token'    => config('services.scrapedoapi.api_key'),
+                        'token'    => $apiTokenInterface->findById(2)->token,
                         'place_id' => $item['place_id'],
                     ])
                     ->throw()
