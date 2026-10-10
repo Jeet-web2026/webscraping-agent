@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('token', 64)->unique();
+            $table->string('token_source')->nullable();
             $table->timestamps();
         });
     }

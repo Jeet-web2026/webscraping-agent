@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\ResearchRequestController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,5 @@ Route::get('/research-requests/{researchRequest}', [ResearchRequestController::c
 Route::get('research-requests/{researchRequest}/download', [ResearchRequestController::class, 'download'])
     ->name('research-requests.download')
     ->middleware('signed');
+
+Route::get('/api-tokens', [ApiTokenController::class, 'index']);

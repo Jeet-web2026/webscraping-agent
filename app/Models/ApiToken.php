@@ -9,5 +9,6 @@ class ApiToken extends Model
     protected $fillable = [
         'name',
         'token',
+        'token_source'
     ];
 }

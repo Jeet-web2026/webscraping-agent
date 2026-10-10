@@ -30,10 +30,50 @@
         <header class="border-b border-slate-800 bg-[#111827]">
             <div class="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-6">
 
-                <div>
+                <div class="flex justify-between items-center w-full">
                     <h1 class="text-[17px] font-semibold tracking-tight">
                         Web Research
                     </h1>
+                    <div class="relative" id="token-menu-root">
+                        <button type="button" id="token-menu-btn" aria-label="More options"
+                            class="p-1.5 rounded-md text-gray-500 cursor-pointer">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="1.8" />
+                                <circle cx="12" cy="12" r="1.8" />
+                                <circle cx="12" cy="19" r="1.8" />
+                            </svg>
+                        </button>
+
+                        <div id="token-menu"
+                            class="hidden absolute right-0 mt-5 w-52 rounded bg-slate-900 border border-gray-800 shadow-lg py-1 z-40 text-white">
+                            <button type="button" id="token-open"
+                                class="w-full text-left px-3 py-2 text-sm cursor-pointer">
+                                Create / Update API token
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="token-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 p-4">
+                    <form method="POST" action="#" class="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl  bg-slate-900 border border-gray-800 p-5 shadow-xl">
+                        @csrf
+
+                        <h2 class="text-base font-semibold">Create / Update API token</h2>
+
+                        {{-- one group per token is rendered here by JS --}}
+                        <div id="token-fields" class="flex gap-2 items-center w-full"></div>
+
+                        <div class="mt-5 flex justify-end gap-2">
+                            <button type="button" id="token-close"
+                                class="rounded-md px-3 py-2 text-sm text-gray-200 bg-gray-500">
+                                Close
+                            </button>
+                            <button type="submit"
+                                class="rounded-md bg-gray-900 px-3 py-2 text-sm text-white bg-green-800">
+                                Save
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
             </div>
@@ -616,6 +656,107 @@
 
         sourceRadios.forEach(radio => radio.addEventListener('change', toggleCategoryField));
         toggleCategoryField();
+
+        function fetchApiTokens() {
+            return fetch('/api-tokens', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Request failed with status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch API tokens:', error);
+                    return null;
+                });
+        }
+
+        const root = document.getElementById('token-menu-root');
+        const menu = document.getElementById('token-menu');
+        const modal = document.getElementById('token-modal');
+        const fieldsBox = document.getElementById('token-fields');
+
+        const closeMenu = () => menu.classList.add('hidden');
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        const inputClass = 'mt-1 w-full rounded-md border border-gray-600 px-3 py-2 text-sm';
+
+        function buildTokenGroup(item, index) {
+            const group = document.createElement('div');
+            group.className = 'w-1/2';
+
+            group.innerHTML = `
+        <input type="hidden" name="tokens[${index}][id]">
+
+        <label class="mt-4 block text-sm font-medium text-white">
+            Name
+            <input type="text" name="tokens[${index}][name]" required class="${inputClass}">
+        </label>
+
+        <label class="mt-4 block text-sm font-medium text-white">
+            Token
+            <input type="text" name="tokens[${index}][token]" required class="${inputClass}">
+        </label>
+
+        <label class="mt-4 block text-sm font-medium text-white">
+            Token Source
+            <input type="text" name="tokens[${index}][token_source]" class="${inputClass}">
+        </label>
+    `;
+
+            // set values via .value so API data is never injected as HTML
+            ['id', 'name', 'token', 'token_source'].forEach((field) => {
+                group.querySelector(`[name="tokens[${index}][${field}]"]`).value = item[field] ?? '';
+            });
+
+            return group;
+        }
+
+        function fillTokenForm(items) {
+            fieldsBox.innerHTML = '';
+
+            // if there is no data yet, show one empty group
+            (items.length ? items : [{}]).forEach((item, index) => {
+                fieldsBox.appendChild(buildTokenGroup(item, index));
+            });
+        }
+
+        document.getElementById('token-menu-btn').addEventListener('click', () => menu.classList.toggle('hidden'));
+
+        document.getElementById('token-open').addEventListener('click', () => {
+            closeMenu();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            fetchApiTokens().then((data) => {
+                // works for a list response or a single object
+                const items = Array.isArray(data) ? data : (data ? [data] : []);
+
+                fillTokenForm(items);
+            });
+        });
+
+        document.getElementById('token-close').addEventListener('click', closeModal);
+        modal.addEventListener('mousedown', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('mousedown', (e) => {
+            if (!root.contains(e.target)) closeMenu();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+                closeModal();
+            }
+        });
     </script>
 
 </body>
