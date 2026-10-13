@@ -24,22 +24,20 @@ class FetchProductWebDataJob implements ShouldQueue
     public function handle(ApiTokenRepositoryInterface $apiTokenInterface): void
     {
         foreach ($this->research->filters['requirements'] as $requirement) {
-            if ($requirement === 'Recent Photo') {
-                $query = $this->imagesSearchQuery();
+            $query = $this->imagesSearchQuery();
 
-                $response = SerpApiHelper::search($query, $apiTokenInterface);
+            $response = SerpApiHelper::search($query, $apiTokenInterface);
 
-                ProductdetailsResponse::query()->updateOrCreate([
-                    'research_request_id' => $this->research->id
-                ], [
-                    'recent_photo' => collect($response['images_results'] ?? [])->pluck('thumbnail')->toArray(),
-                    'website' => collect($response['suggested_searches'] ?? [])->pluck('link')->toArray()
-                ]);
+            ProductdetailsResponse::query()->updateOrCreate([
+                'research_request_id' => $this->research->id
+            ], [
+                'recent_photo' => collect($response['images_results'] ?? [])->pluck('thumbnail')->toArray(),
+                'website' => collect($response['suggested_searches'] ?? [])->pluck('link')->toArray()
+            ]);
 
-                $this->research->update([
-                    'status' => 'completed'
-                ]);
-            }
+            $this->research->update([
+                'status' => 'completed'
+            ]);
         }
     }
 

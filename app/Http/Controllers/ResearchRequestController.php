@@ -6,6 +6,7 @@ use App\Exports\ResearchResultExport;
 use App\Http\Requests\StoreAiRequest;
 use App\Jobs\FetchOtherDetailsJob;
 use App\Jobs\FetchProductWebDataJob;
+use App\Jobs\GenerateResearchExportJob;
 use App\Jobs\ResearchAgentJob;
 use App\Jobs\ResearchFromEcommerceBusinessRelatedDetailsJob;
 use App\Jobs\ResearchFromEcommerceJob;
@@ -37,16 +38,24 @@ class ResearchRequestController extends Controller
             'status' => 'pending',
         ]);
 
+        $recordId = $record->id;
+
         if ($data['source'] === 'search') {
-            Bus::chain([
+            Bus::batch([
                 new ResearchAgentJob($record->id),
                 new FetchOtherDetailsJob($record),
-                new FetchProductWebDataJob($record, $data)
-            ])->dispatch();
+                new FetchProductWebDataJob($record, $data),
+            ])->then(function () use ($recordId) {
+                GenerateResearchExportJob::dispatch($recordId);
+            })->dispatch();
         } else {
-            ResearchFromEcommerceJob::dispatch($record->id, $request->product_category, $request->pincode);
-            ResearchFromEcommerceBusinessRelatedDetailsJob::dispatch($record);
-            FetchProductWebDataJob::dispatch($record, $data);
+            Bus::batch([
+                new ResearchFromEcommerceJob($record->id, $request->product_category, $request->pincode),
+                new ResearchFromEcommerceBusinessRelatedDetailsJob($record),
+                new FetchProductWebDataJob($record, $data),
+            ])->then(function () use ($recordId) {
+                GenerateResearchExportJob::dispatch($recordId);
+            })->dispatch();
         }
 
         return response()->json([
