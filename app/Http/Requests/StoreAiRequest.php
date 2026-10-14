@@ -17,12 +17,15 @@ class StoreAiRequest extends FormRequest
             'type' => 'required|in:seller,service',
             'product_name' => 'required|string|max:255',
             'product_category' => 'nullable|string|max:255',
-            'country' => 'required|string',
-            'state' => 'required|string',
-            'district' => 'required|string',
-            'block' => 'nullable|string',
-            'pincode' => 'nullable|digits:6',
-            'source' => 'required|string',
+            'geolocation_search' => 'nullable|boolean',
+
+            'country'  => 'required_without:geolocation_search|nullable|string',
+            'state'    => 'required_without:geolocation_search|nullable|string',
+            'district' => 'required_without:geolocation_search|nullable|string',
+            'pincode'  => 'required_without:geolocation_search|nullable|digits:6',
+            'block'    => 'nullable|string',
+            
+            'source' => 'sometimes|string',
         ];
     }
 }

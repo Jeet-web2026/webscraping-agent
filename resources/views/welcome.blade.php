@@ -229,7 +229,11 @@
 
 
                     <div class="space-y-2 p-5">
-
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer mb-4">
+                            <input type="checkbox" name="geolocation_search" id="geolocation_search" value="1"
+                                class="h-4 w-4 rounded border-slate-600">
+                            Geolocation search
+                        </label>
 
                         {{-- LOCATION --}}
                         <div>
@@ -757,6 +761,29 @@
                 closeMenu();
                 closeModal();
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkbox = document.getElementById('geolocation_search');
+            const fields = [
+                document.getElementById('country_field'),
+                document.getElementById('state_field'),
+                document.getElementById('district_field'),
+                document.querySelector('input[name="pincode"]'),
+                document.querySelector('input[name="block"]'),
+            ];
+
+            checkbox.addEventListener('change', () => {
+                fields.forEach(el => {
+                    if (!el) return;
+                    if (checkbox.checked) {
+                        el.value = ''; // blank the value
+                        el.dispatchEvent(new Event('change')); // let your country/state/district scripts reset
+                    }
+                    el.disabled = checkbox.checked; // optional: lock the fields
+                    el.classList.toggle('opacity-50', checkbox.checked);
+                });
+            });
         });
     </script>
 
