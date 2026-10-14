@@ -6,6 +6,7 @@ use App\Helpers\SerpApiHelper;
 use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ProductdetailsResponse;
 use App\Models\ResearchRequest;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,7 +15,7 @@ use Illuminate\Queue\SerializesModels;
 
 class FetchProductWebDataJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
 
     public function __construct(
         private ResearchRequest $research,

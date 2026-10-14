@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 
 class ResearchFromEcommerceJob implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, Batchable;
 
     public int $tries = 1;
     public int $timeout = 300;

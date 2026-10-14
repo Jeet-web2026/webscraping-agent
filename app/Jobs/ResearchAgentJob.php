@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 
 class ResearchAgentJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, Batchable;
 
     public int $tries = 1;
     public int $timeout = 300;

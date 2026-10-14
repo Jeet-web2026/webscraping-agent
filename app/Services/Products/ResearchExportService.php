@@ -13,15 +13,21 @@ class ResearchExportService
 {
     public function fileName(ResearchRequest $r): string
     {
-        $product  = $r->product_service;
-        $category = $r->category_name;
+        $params = $r->filters;
+
+        if (is_string($params)) {
+            $params = json_decode($params, true);
+        }
+
+        $type    = data_get($params, 'type');
+        $keyword = data_get($params, 'keyword');
 
         $clean = fn($v) => trim(preg_replace('/[^A-Za-z0-9]+/', '_', (string) $v), '_');
 
         $parts = array_filter([
             $r->created_at->format('Y-m-d_H-i-s'),
-            $clean($product),
-            $clean($category),
+            $clean($type),
+            $clean($keyword),
         ]);
 
         return Str::limit(implode('_', $parts), 150, '') . '.csv';

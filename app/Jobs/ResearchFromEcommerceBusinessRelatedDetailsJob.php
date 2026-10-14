@@ -4,13 +4,14 @@ namespace App\Jobs;
 
 use App\Interfaces\ApiTokenRepositoryInterface;
 use App\Models\ResearchRequest;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 
 class ResearchFromEcommerceBusinessRelatedDetailsJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, Batchable;
 
 
     public function __construct(private readonly ResearchRequest $researchRequest) {}

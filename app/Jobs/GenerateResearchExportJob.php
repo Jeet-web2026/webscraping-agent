@@ -4,13 +4,14 @@ namespace App\Jobs;
 
 use App\Models\ResearchRequest;
 use App\Services\Products\ResearchExportService;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
 class GenerateResearchExportJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, Batchable;
 
     public function __construct(public int $researchRequestId) {}
 
